@@ -6,8 +6,6 @@ const InputField = (props) =>{
 	const [value, setValue] =  useState(props.value)
 
 	useEffect(() => {
-		console.log('here i am')
-		console.log(props.value)
 		setValue(props.value)
 	}, [props])
 	//console.log(props.value)
@@ -37,7 +35,7 @@ const InputField = (props) =>{
 
 return (
 <input type="text" readOnly={props.readOnly} 
- className={`square ${props.extraClass}`} value={value} onChange={(e) => checkValue(e.target.value) } />
+ className={`square ${props.extraClass}`} value={value ? value : ''} onChange={(e) => checkValue(e.target.value) } />
 )
 
 }

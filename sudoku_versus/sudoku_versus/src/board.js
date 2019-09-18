@@ -26,6 +26,7 @@ const RenderBoard = (props) => {
 					inputValue={(inputValues && Object.keys(inputValues).length > 0 && inputValues[cellID]) ? inputValues[cellID] : ''}
 					key={cellID}
 					value={cellVal}
+					player={props.player}
 				/>
 
 			)

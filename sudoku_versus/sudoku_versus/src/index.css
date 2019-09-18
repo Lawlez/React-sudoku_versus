@@ -9,8 +9,22 @@ code {
 	font-family: source-code-pro, Consolas, monospace;
 }
 
-.squareWrapper {
-	
+.squareWrapper {}
+
+.row div:nth-child(3) {
+	border-right: 3px solid #000;
+}
+
+.row div:nth-child(6) {
+	border-right: 3px solid #000;
+}
+
+.row:nth-child(3) {
+	border-bottom: 3px solid #000;
+}
+
+.row:nth-child(6) {
+	border-bottom: 3px solid #000;
 }
 
 .square {
@@ -22,11 +36,13 @@ code {
 }
 
 .row {
-	display:flex;
+	display: flex;
 }
-.fieldContainer{
+
+.fieldContainer {
 	display: flex
 }
+
 .playField1 {
 	margin-left: 80px;
 	width: 510px;
@@ -38,8 +54,9 @@ code {
 .playField2 {
 	width: 510px;
 }
-.playField2 .immutable{
-	background:rgb(230, 255, 230)!important;
+
+.playField2 .immutable {
+	background: rgb(230, 255, 230) !important;
 }
 
 .game {
@@ -56,7 +73,7 @@ code {
 	background: #ff1111;
 }
 
-.button {
+/*.button {
 	padding: 20px;
 	font-size: 15px;
 	background-color: #2273ca;
@@ -70,7 +87,7 @@ code {
 
 .button.attack {
 	background-color: #d85b5b !important;
-}
+}*/
 
 .timer {
 	border: 2px solid #000;
@@ -108,7 +125,7 @@ code {
 	font-size: 18px;
 	margin-right: 10px;
 }
-
+/*
 .loginInner button {
 	height: 30px;
 	padding: 3px;
@@ -120,26 +137,30 @@ code {
 
 .loginInner button:active {
 	background: rgb(200, 130, 175);
+}*/
+
+.userActivity {
+	padding: 5px;
+	background-color: #f6f6f6;
+	width: auto;
+	max-width: 500px;
 }
-.userActivity{
-    padding: 5px;
-    background-color: #f6f6f6;
-    width:auto;
-    max-width: 500px;
-}
-.opponent{
+
+.opponent {
 	width: 54px;
 	height: 54px;
-border: 1px solid;
+	border: 1px solid;
 }
-.playerSelect{
-	font-size: 16px!important ;
+
+.playerSelect {
+	font-size: 16px !important;
 	position: absolute;
 	margin-top: -3px;
-    margin-left: -18px;
+	margin-left: -18px;
 
 }
-.poo{
-	    font-size: 42px!important;
-    display: inline-flex;
+
+.poo {
+	font-size: 42px !important;
+	display: inline-flex;
 }

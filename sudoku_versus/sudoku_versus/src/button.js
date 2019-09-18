@@ -1,12 +1,13 @@
 //Button
 import React from 'react';
+import Button from '@material-ui/core/Button';
 
-export const Button = (props) => {
+export const MyButton = (props) => {
  let classNames = 'button'
  if (props.extraclass) {classNames = `button ${props.extraclass}`}
 return(
-	<button className={classNames} onClick={props.onClick} >{props.text} </button>
+	<Button className={classNames} variant="contained" color={props.color} onClick={props.onClick} >{props.text} </Button>
 	)
 }
 
-export default Button
+export default MyButton

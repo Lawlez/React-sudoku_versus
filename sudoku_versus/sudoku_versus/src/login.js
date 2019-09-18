@@ -1,9 +1,10 @@
 //login component
 import React from 'react'
 
+import MyButton from './button'
 const Login = (props) => {
 
-	//TODO select player 1 or 2 or spectator mode
+	//TODO select spectator mode or be a player
 	return (
 		<div className="loginWrapper">
 			<div className="loginInner">
@@ -13,25 +14,16 @@ const Login = (props) => {
 					//value={props.uName}
 					onChange={(e) => props.handleUserInput(e.target.value)}
 				/>
-				<button onClick={props.onSubmit}> Start! </button>
+				<MyButton color="default"variant="contained" text="Start!" onClick={props.onSubmit}/>
 				<br/>
-				{(props.allPlayers === false)? (
 					<div>
 					<input type="radio" 
 					className="playerSelect" 
 					name="player" 
-					value="1" 
+					value="spectator" 
 					onChange={(e) => props.handlePlayerSelect(e.target.value)}
-					/><label>Player 1</label> <br/>
-				<input 
-				type="radio" 
-				className="playerSelect" 
-				name="player" 
-				value="2" 
-				onChange={(e) => props.handlePlayerSelect(e.target.value)}
-				/> <label>Player 2</label>
+					/><label>Join as a Spectator</label>
 				</div>
-				):( <br/>)}
 			</div>
 		</div>
 	)

@@ -35,7 +35,6 @@ const WebSocketSrv = () => {
 
 	const sendMessage = (json) => {
 		// We are sending the current data to all connected clients
-		// TODO for array not obj
 		Object.keys(clients).map((client) => {
 			clients[client].sendUTF(json)
 		})
@@ -54,7 +53,10 @@ const WebSocketSrv = () => {
 			players: playersReady
 		}
 		console.log(json)
-		sendMessage(JSON.stringify(json))
+		setTimeout(function() {
+			sendMessage(JSON.stringify(json)) ///wait 1 seconds until cleint is rdy to recieve
+		}, 1000)
+
 		// You can rewrite this part of the code to accept only the requests from allowed origin
 		const connection = request.accept(null, request.origin)
 		clients[userID] = connection
@@ -82,13 +84,18 @@ const WebSocketSrv = () => {
 				userActivity.push(
 					`${dataFromClient.username} joined the Game as Player ${dataFromClient.player} with UID ${userID}`
 				)
-				
-				playersReady++
-
+				if (
+					dataFromClient.player === 1 ||
+					dataFromClient.player === 2
+				) {
+					playersReady++
+				}
 
 				json.data = {
 					username: users[userID],
-					'user-id': userID,
+					userid: userID,
+					player: dataFromClient.player,
+					playersReady: playersReady,
 					userActivity
 				} //add user +activity to the data of our response
 			}
@@ -96,8 +103,12 @@ const WebSocketSrv = () => {
 				userActivity.push(
 					`${dataFromClient.username} RESET the Game as Player ${dataFromClient.player} with UID ${userID}`
 				)
-				gameField2 = {}
-				gameField1 = {}
+				if (dataFromClient.player === 1) {
+					gameField1 = {}
+				}
+				if (dataFromClient.player === 2) {
+					gameField2 = {}
+				}
 				json.data = {
 					username: users[userID],
 					'user-id': userID,
@@ -106,8 +117,13 @@ const WebSocketSrv = () => {
 			}
 
 			if (dataFromClient.type === reqTypes.GAME_MOVE) {
+				console.log(
+					dataFromClient.player,
+					'<client',
+					dataFromClient.player === 1
+				)
 				if (dataFromClient.player === 1) {
-					
+					console.log('hellouu im player 1')
 					let index = dataFromClient.inputPos
 					gameField1[index] = dataFromClient.input
 
@@ -118,9 +134,8 @@ const WebSocketSrv = () => {
 						index: index
 					}
 					console.log(json.data)
-				}
-				if (dataFromClient.player === 2) {
-
+				} else if (dataFromClient.player === 2) {
+					console.log('hellouu im player two')
 					let index = dataFromClient.inputPos
 					gameField2[index] = dataFromClient.input
 					json.data = {
@@ -128,6 +143,13 @@ const WebSocketSrv = () => {
 						player: 2,
 						gamefield: gameField2,
 						index: index
+					}
+				} else {
+					console.log('im not player 1 |2 ')
+					json.data = {
+						user: users[userID],
+						player: dataFromClient.player,
+						warn: 'ILLEGAL MOVE'
 					}
 				}
 			}
@@ -141,7 +163,8 @@ const WebSocketSrv = () => {
 		connection.on('close', function(connection) {
 			console.log(new Date() + ' Peer ' + userID + ' disconnected.')
 			const json = {type: reqTypes.USER_EVENT}
-			userActivity.push(`${users[userID].username} left the Game`)
+			let userLeft = users[userID] && users[userID].username
+			userActivity.push(`${userLeft} left the Game`)
 			json.data = {users, userActivity}
 			//todo if player leaves remove from array
 			delete clients[userID]
