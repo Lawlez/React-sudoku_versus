@@ -10,7 +10,7 @@ import {w3cwebsocket as W3CWebSocket} from 'websocket'
 
 const client = new W3CWebSocket('ws://192.168.100.211:8080')
 
-const fields = [
+export const fields = [
 	[4, 8, null, null, null, 5, null, 9, 7],
 	[null, null, 7, 2, null, 9, 3, null, 6],
 	[9, 2, 6, 4, 7, 3, null, null, null],
@@ -29,28 +29,16 @@ const Game = () => {
 	const [fieldInput, setFieldInput] = useState({})
 	const [opponentFields, setOpponentFields] = useState({})
 	const [playerNumber, setPlayerNumber] = useState()
-	const [timer, setTimer] = useState(0)
+	
 	let tempName
 	let dataFromServer
-	const[isActive, setIsActive] = useState(false)
+	let allPlayers = false
 
-useEffect(()=>{
-	let interval
-
-	if (isActive) {
-		interval = setInterval(()=>{
-			setTimer(timer => timer +1)
-		},1000)
-
-	}else if(!isActive && timer !== 0){
-		clearInterval(interval)
-	}
-	return () => clearInterval(interval)
-}, [isActive, timer])
 
 	////////// Websocket functions start///////////////////
 	client.onopen = () => {
 		console.log('WebSocket Client Connected to server')
+
 	}
 	client.onclose = () => {
 		console.log('WebSocket server closing or offline...')
@@ -59,6 +47,12 @@ useEffect(()=>{
 		dataFromServer = JSON.parse(message.data)
 		console.log('im RECIEVING parsed: ', dataFromServer)
 		console.log('im player', playerNumber)
+		if (dataFromServer.type === 'info') {
+			if (dataFromServer.players >= 2 ){
+				allPlayers = true
+			}
+			return
+		}
 		if (dataFromServer.type === 'userevent') {
 			/* ON USEREVENT*/
 
@@ -73,14 +67,30 @@ useEffect(()=>{
 				setUserName(dataFromServer.data.username)
 
 				setIsLoggedIn(true)
-			} else {
-				setIsLoggedIn(isLoggedIn)
+			} else if (dataFromServer.data.username === 'UsrNameTaken'){
+				alert('username already exists! sorry :c ')
+				setIsLoggedIn(false)
+			}
+			if(dataFromServer.data.playersReady === 2){
+				allPlayers = true
 			}
 		}
+
+
+		if (dataFromServer.type === 'resetgame') {
+			let index = dataFromServer.data.userActivity.length - 1
+			let newestActivity = [
+				...userActivity,
+				dataFromServer.data.userActivity[index]
+			]
+			setUserActivity(newestActivity)
+			setFieldInput(undefined)
+			console.log(fieldInput)}
 		console.log(dataFromServer.data.player, 'comp', playerNumber)
+
 		if (dataFromServer.type === 'gamemove') {
 			//TODO handle server response for game moves
-			if(!isActive){setIsActive(!isActive)}
+			//if(!isActive){setIsActive(!isActive)}
 			if (dataFromServer.data.player === playerNumber) {
 				console.log('I made a move')
 
@@ -134,7 +144,6 @@ useEffect(()=>{
 
 	///// Game Functions /////
 	const resetGame = () => {
-		setFieldInput('')
 		client.send(
 				JSON.stringify({
 					username: userName,
@@ -149,7 +158,7 @@ useEffect(()=>{
 		console.log('TODO launch attack function')
 	}
 	////// end Game Functions /////
-
+	console.log('ZIT FèR HERA ', fieldInput)
 	return (
 		<div className="game">
 			<div className="userActivity">
@@ -157,6 +166,7 @@ useEffect(()=>{
 			</div>
 			{!isLoggedIn ? (
 				<Login
+					allPlayers={allPlayers}
 					onSubmit={() => onSubmit()}
 					uName={userName}
 					handleUserInput={(e) => handleUserNameInput(e)}
@@ -164,11 +174,11 @@ useEffect(()=>{
 				/>
 			) : (
 				<div>
-					<Timer time={timer} />
+					<Timer/>
 					<div className="fieldContainer">
 						<div className="playField1">
 							<RenderBoard
-								fields={(i, id) => getFields(i, id)}
+								/*fields={  (i, id) => getFields(i, id)}*/
 								handleUserInput={(e, cellID) =>
 									handleUserInput(e, cellID)
 								}
@@ -188,7 +198,7 @@ useEffect(()=>{
 						</div>
 						<div className="playField2">
 							<RenderBoard
-								fields={(i, id) => getFields(i, id)}
+								/*fields={(i, id) => getFields(i, id)}*/
 								handleUserInput
 								opponent="true"
 								opponentFields={opponentFields}

@@ -1,10 +1,17 @@
 
-import React,  {useState}from 'react';
+import React,  { useEffect, useState}from 'react';
 
 const InputField = (props) =>{
-	const [value, setValue] =  useState(props.value? props.value : '')
 
-const checkValue=(input)=>{
+	const [value, setValue] =  useState(props.value)
+
+	useEffect(() => {
+		console.log('here i am')
+		console.log(props.value)
+		setValue(props.value)
+	}, [props])
+	//console.log(props.value)
+	const checkValue=(input)=>{
 	if (input) {
 			if (isNaN(input)) {
 				//check if input is a number

@@ -13,14 +13,25 @@ const Login = (props) => {
 					//value={props.uName}
 					onChange={(e) => props.handleUserInput(e.target.value)}
 				/>
-				<button onClick={props.onSubmit}> Submit </button>
+				<button onClick={props.onSubmit}> Start! </button>
 				<br/>
-				<input type="radio" className="playerSelect" name="player" value="1" onChange={(e) => props.handlePlayerSelect(e.target.value)}/> Player 1<br/>
-				<input type="radio" className="playerSelect" name="player" value="2" onChange={(e) => props.handlePlayerSelect(e.target.value)}/> Player 2
-			
-
-				
-
+				{(props.allPlayers === false)? (
+					<div>
+					<input type="radio" 
+					className="playerSelect" 
+					name="player" 
+					value="1" 
+					onChange={(e) => props.handlePlayerSelect(e.target.value)}
+					/><label>Player 1</label> <br/>
+				<input 
+				type="radio" 
+				className="playerSelect" 
+				name="player" 
+				value="2" 
+				onChange={(e) => props.handlePlayerSelect(e.target.value)}
+				/> <label>Player 2</label>
+				</div>
+				):( <br/>)}
 			</div>
 		</div>
 	)

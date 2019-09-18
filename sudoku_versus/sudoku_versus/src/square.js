@@ -8,7 +8,7 @@ export const NewSquare = (props) => {
 	}
 	else{
 		if (props.opponent){
-		field = <div className="square opponent">{(props.opponentValues) ? <span class="poo">💩</span> : null}</div>
+		field = <div className="square opponent">{(props.opponentValues) ? <span className="poo" role="img" aria-label="poo">💩</span> : null}</div>
 	}else{ 
 		field = <InputField  value={props.inputValue} onCorrectInput={(value) =>  props.handleUserInput(value)} />
 	}
