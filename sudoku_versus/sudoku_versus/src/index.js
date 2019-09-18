@@ -113,7 +113,6 @@ const Game = () => {
 		if (dataFromServer.type === 'attack') {
 			//TODO handle server response for attacks
 		}
-
 	}
 	////////// Websocket functions end///////////////////
 
@@ -178,9 +177,11 @@ const Game = () => {
 
 	return (
 		<div className="game">
-			<div className="userActivity">
-				activity: {userActivity[userActivity.length - 1]}
-			</div>
+			<Container>
+				<div className="userActivity">
+					activity: {userActivity[userActivity.length - 1]}
+				</div>
+			</Container>
 			{!isLoggedIn ? (
 				<Login
 					onSubmit={() => onSubmit()}
@@ -188,59 +189,63 @@ const Game = () => {
 					handlePlayerSelect={(e) => setPlayerNumber(e)}
 				/>
 			) : (
-				<div><Container>
-					<Timer />
+				<div>
+					<Container>
+						<Timer />
 					</Container>
-					<Container className="fieldContainer"
-					>
-					<Grid container>
-						<Grid item xs={6} className="playField1"
-						><Paper >
-							<RenderBoard
-								handleUserInput={(e, cellID) =>
-									handleUserInput(e, cellID)
-								}
-								inputValues={fieldInput}
-								opponentFields={opponentFields}
-								player={playerNumber}
-							/>
-							{isNaN(playerNumber) ? (
-								<MyButton
-									onClick={() => launchAttack()}
-									text="Attack"
-									color="secondary"
-								/>
-							) : (
-								<div>
-									<MyButton
-										onClick={() => resetGame()}
-										text="reset"
-										color="default"
+					<Container className="fieldContainer">
+						<Grid container>
+							<Grid item xs={6} className="playField1">
+								<Paper>
+									<RenderBoard
+										handleUserInput={(e, cellID) =>
+											handleUserInput(e, cellID)
+										}
+										inputValues={fieldInput}
+										opponentFields={opponentFields}
+										player={playerNumber}
 									/>
-									<MyButton
-										onClick={() => endGame()}
-										text="i'm done!"
-										color="primary"
+									{isNaN(playerNumber) ? (
+										<MyButton
+											onClick={() => launchAttack()}
+											text="Attack"
+											color="secondary"
+										/>
+									) : (
+										<Grid container>
+											<Grid item xs={6}>
+												<MyButton
+													onClick={() => resetGame()}
+													text="reset"
+													color="default"
+												/>
+											</Grid>
+											<Grid item xs={6}>
+												<MyButton
+													onClick={() => endGame()}
+													text="i'm done!"
+													color="primary"
+												/>
+												<br />
+											</Grid>
+										</Grid>
+									)}
+								</Paper>
+							</Grid>
+							<Grid item xs={6} className="playField2">
+								<Paper>
+									<RenderBoard
+										handleUserInput
+										opponent="true"
+										opponentFields={opponentFields}
+										player={playerNumber}
 									/>
-								</div>
-							)}
-							</Paper>
-						</Grid>
-						<Grid item xs={6} className="playField2"
-						><Paper >
-							<RenderBoard
-								handleUserInput
-								opponent="true"
-								opponentFields={opponentFields}
-								player={playerNumber}
-							/>
-							</Paper>
-						</Grid>
+								</Paper>
+							</Grid>
 						</Grid>
 					</Container>
-					<Chat/>
+					<Chat />
 				</div>
-
 			)}
 		</div>
 	)

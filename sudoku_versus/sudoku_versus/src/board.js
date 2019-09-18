@@ -23,14 +23,18 @@ const RenderBoard = (props) => {
 					opponentValues={
 						props.opponentFields && props.opponentFields[cellID]
 					}
-					inputValue={(inputValues && Object.keys(inputValues).length > 0 && inputValues[cellID]) ? inputValues[cellID] : ''}
+					inputValue={
+						inputValues &&
+						Object.keys(inputValues).length > 0 &&
+						inputValues[cellID]
+							? inputValues[cellID]
+							: ''
+					}
 					key={cellID}
 					value={cellVal}
 					player={props.player}
 				/>
-
 			)
-
 		}
 
 		rows.push(

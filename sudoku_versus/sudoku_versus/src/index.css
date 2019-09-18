@@ -54,7 +54,9 @@ code {
 }
 
 .playField2 .immutable {
-	background: rgb(230, 255, 230) !important;
+	color:#fff;
+	border-color:#d81b60!important;
+	background: #f50057 !important;
 }
 
 .game {
@@ -64,35 +66,16 @@ code {
 }
 
 .immutable {
-	background: rgba(245, 230, 255, 1);
+	color:#fff;
+	background: #3f51b5;
+	border:2px solid #3949ab;
 }
-
-.censored {
-	background: #ff1111;
-}
-
-/*.button {
-	padding: 20px;
-	font-size: 15px;
-	background-color: #2273ca;
-	margin-left: 35px;
-	margin-right: 40px;
-	margin-top: 50px;
-	border-radius: 5px;
-	border: none;
-	color: #fff;
-}
-
-.button.attack {
-	background-color: #d85b5b !important;
-}*/
 
 .timer {
 	border: 2px solid #000;
-	font-size: 26px;
 	width:auto;
-	max-width: 180px;
-	padding: 10px;
+	max-width: 130px;
+	padding: 5px;
 	margin-bottom: 20px;
 }
 
@@ -123,25 +106,14 @@ code {
 	font-size: 18px;
 	margin-right: 10px;
 }
-/*
-.loginInner button {
-	height: 30px;
-	padding: 3px;
-	padding-left: 20px;
-	padding-right: 20px;
-	font-size: 18px;
-	background: rgb(250, 160, 234);
-}
-
-.loginInner button:active {
-	background: rgb(200, 130, 175);
-}*/
 
 .userActivity {
-	padding: 5px;
+	display:flex;
+	padding: 2px;
 	background-color: #f6f6f6;
 	width: auto;
-	max-width: 500px;
+	font-size: 12px;
+	max-width: 400px;
 }
 
 .opponent {
