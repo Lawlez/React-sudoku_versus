@@ -21,10 +21,11 @@ useEffect(()=>{
 	}
 	return () => clearInterval(interval)
 }, [isActive, timer])
+let timerContent = timer + ' seconds'
 //TODO timer function
 	return (
 		<div className="timer">
-		{timer} seconds
+		{timerContent}
 		</div>
 		)
 }

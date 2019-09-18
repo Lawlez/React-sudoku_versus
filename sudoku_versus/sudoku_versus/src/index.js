@@ -1,3 +1,6 @@
+import Container from '@material-ui/core/Container'
+import Paper from '@material-ui/core/Paper'
+import Grid from '@material-ui/core/Grid'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
@@ -5,6 +8,7 @@ import RenderBoard from './board'
 import MyButton from './button'
 import Timer from './timer'
 import Login from './login'
+import Chat from './chat'
 import {w3cwebsocket as W3CWebSocket} from 'websocket'
 
 const client = new W3CWebSocket('ws://192.168.100.211:8080')
@@ -184,10 +188,14 @@ const Game = () => {
 					handlePlayerSelect={(e) => setPlayerNumber(e)}
 				/>
 			) : (
-				<div>
+				<div><Container>
 					<Timer />
-					<div className="fieldContainer">
-						<div className="playField1">
+					</Container>
+					<Container className="fieldContainer"
+					>
+					<Grid container>
+						<Grid item xs={6} className="playField1"
+						><Paper >
 							<RenderBoard
 								handleUserInput={(e, cellID) =>
 									handleUserInput(e, cellID)
@@ -216,17 +224,23 @@ const Game = () => {
 									/>
 								</div>
 							)}
-						</div>
-						<div className="playField2">
+							</Paper>
+						</Grid>
+						<Grid item xs={6} className="playField2"
+						><Paper >
 							<RenderBoard
 								handleUserInput
 								opponent="true"
 								opponentFields={opponentFields}
 								player={playerNumber}
 							/>
-						</div>
-					</div>
+							</Paper>
+						</Grid>
+						</Grid>
+					</Container>
+					<Chat/>
 				</div>
+
 			)}
 		</div>
 	)

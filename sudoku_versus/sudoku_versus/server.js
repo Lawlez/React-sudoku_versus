@@ -166,6 +166,7 @@ const WebSocketSrv = () => {
 			let userLeft = users[userID] && users[userID].username
 			userActivity.push(`${userLeft} left the Game`)
 			json.data = {users, userActivity}
+			if (playersReady > 0 ){playersReady--}
 			//todo if player leaves remove from array
 			delete clients[userID]
 			delete users[userID]
