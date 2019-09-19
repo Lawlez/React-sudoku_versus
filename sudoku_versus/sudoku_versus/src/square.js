@@ -7,11 +7,11 @@ export const NewSquare = (props) => {
 		field = <InputField type="text" value={props.value} readOnly extraClass="immutable"/>
 	}
 	else{
-		if (props.opponent || isNaN(props.player)){
+		if (props.opponent){
 		field = <div className="square opponent">{(props.opponentValues) ? <span className="poo" role="img" aria-label="poo">💩</span> : null}</div>
 	}
 	else if(props.player === 'spectator'){ 
-		field = <div className="square immutable opponent"> {(props.opponent) ?(
+		field = <div className="square  opponent"> {(props.opponent) ?(
 			props.opponentValues ? <span className="poo" role="img" aria-label="poo">💩</span> : null
 		):(
 			props.inputValue ? <span className="poo" role="img" aria-label="poo">💩</span> : null
@@ -21,7 +21,7 @@ export const NewSquare = (props) => {
 		field = <InputField  value={props.inputValue} onCorrectInput={(value) =>  props.handleUserInput(value)} />
 	}
 	}
-
+console.log('p2 ', props.opponentValues, 'p1 ', props.inputValue)
 	return(
 		<div className="squareWrapper">
 		{field}

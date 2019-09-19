@@ -13,15 +13,19 @@ const WebSocketSrv = () => {
 
 	const clients = {}
 	const users = {}
+	let spectators={}
+	let players = {}
 	let userActivity = []
 	let gameField1 = {}
 	let gameField2 = {}
+	let messageHistory = []
 	let playersReady = 0 //todo array with players
 	const reqTypes = {
 		USER_EVENT: 'userevent',
 		GAME_MOVE: 'gamemove',
 		ATTACK: 'attack',
-		RESET: 'resetgame'
+		RESET: 'resetgame',
+		CHAT: 'chat'
 	}
 
 	// generates unique userid for everyuser.
@@ -38,6 +42,22 @@ const WebSocketSrv = () => {
 		Object.keys(clients).map((client) => {
 			clients[client].sendUTF(json)
 		})
+	}
+	const sendGameMove = (json) => {
+		Object.keys(players).map((player)=>{
+			console.log('plapyersend', player)
+			players[player].sendUTF(JSON.stringify(json))
+		})
+		json.field = {
+			gamefield1: gameField1,
+			gamefield2: gameField2
+
+		}
+		Object.keys(spectators).map((spectator)=>{
+			console.log('spectatorsend', spectator)
+			spectators[spectator].sendUTF(JSON.stringify(json))
+		})
+		
 	}
 
 	wsServer.on('request', function(request) {
@@ -88,9 +108,12 @@ const WebSocketSrv = () => {
 					dataFromClient.player === 1 ||
 					dataFromClient.player === 2
 				) {
+					players = {...players, player: clients[userID]}
 					playersReady++
 				}
-
+				let currClient = clients[userID]
+				if (dataFromClient.player === 'spectator') {spectators= {...spectators, spectator: currClient}}
+					console.log('spectators: ',spectators)
 				json.data = {
 					username: users[userID],
 					userid: userID,
@@ -113,6 +136,17 @@ const WebSocketSrv = () => {
 					username: users[userID],
 					'user-id': userID,
 					userActivity
+				} //add user +activity to the data of our response
+			}
+
+			if (dataFromClient.type === reqTypes.CHAT) {
+				console.log(dataFromClient.msg)
+				messageHistory = [ ...messageHistory,`${users[userID]}: ${dataFromClient.msg}`]
+				json.data = {
+					username: users[userID],
+					'user-id': userID,
+					player: dataFromClient.player,
+					chat: messageHistory
 				} //add user +activity to the data of our response
 			}
 
@@ -155,7 +189,7 @@ const WebSocketSrv = () => {
 			}
 
 			//TODO if ATTACK
-
+			if (json.type === 'gamemove') {sendGameMove(json)}
 			console.log('Message i sent to client: ', json)
 			sendMessage(JSON.stringify(json))
 		})

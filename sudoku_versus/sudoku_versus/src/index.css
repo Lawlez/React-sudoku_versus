@@ -40,7 +40,7 @@ code {
 }
 
 .fieldContainer {
-	margin-bottom: 50px;
+	margin-bottom: 25px;
 }
 
 .playField1 {
@@ -131,6 +131,7 @@ code {
 }
 
 .poo {
+	color: rgba(0, 0, 0, 1);
 	font-size: 42px !important;
 	display: inline-flex;
 }

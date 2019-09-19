@@ -1,3 +1,4 @@
+import {makeStyles} from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
@@ -24,9 +25,22 @@ export const fields = [
 	[null, null, null, 3, null, null, 4, 7, null],
 	[6, 4, 1, null, 5, 2, null, null, null]
 ]
+const useStyles = makeStyles(theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing(2),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+  button: {
+    margin: theme.spacing(1),
+  },
+}));
 
 const Game = () => {
-	const [isLoggedIn, setIsLoggedIn] = useState(false)
+	const [isLoggedIn, setIsLoggedIn] = useState(false) //toggle logiin
 	const [userName, setUserName] = useState()
 	const [userActivity, setUserActivity] = useState([])
 	const [fieldInput, setFieldInput] = useState({})
@@ -34,8 +48,11 @@ const Game = () => {
 	const [playerNumber, setPlayerNumber] = useState('')
 	const [tempName, setTempName] = useState('')
 	const [allPlayers, setAllPlayers] = useState(0)
+	const classes = useStyles();
+	const [messageHistory, setMessageHistory] = useState([])
+	//let messageHistory = []
 	let dataFromServer
-
+console.log(playerNumber)
 	////////// Websocket functions start///////////////////
 	client.onopen = () => {
 		console.log('WebSocket Client Connected to server')
@@ -93,21 +110,36 @@ const Game = () => {
 			setFieldInput(undefined)
 			console.log(fieldInput)
 		}
+
+		if (dataFromServer.type === 'chat') {
+			setMessageHistory([...dataFromServer.data.chat])
+			console.log('index history ',messageHistory)
+		}
 		console.log(dataFromServer.data.player, 'comp', playerNumber)
 
 		if (dataFromServer.type === 'gamemove') {
 			//TODO handle server response for game moves
 			//if(!isActive){setIsActive(!isActive)}
-			if (dataFromServer.data.player === playerNumber) {
+			if (playerNumber === 'spectator') {
+
+			if (dataFromServer.field) {
+				console.log('spectator hey')
+				setFieldInput(dataFromServer.field.gamefield1)
+				setOpponentFields(dataFromServer.field.gamefield2)
+			}
+			}else{
+				if (dataFromServer.data.player === playerNumber) {
 				console.log('I made a move')
 
 				setFieldInput(dataFromServer.data.gamefield)
 				console.log(fieldInput)
-			} else {
+			} else{
 				console.log('OPPONENT made a move')
 				setOpponentFields(dataFromServer.data.gamefield)
 				console.log(opponentFields)
 			}
+			}
+			
 		}
 
 		if (dataFromServer.type === 'attack') {
@@ -126,19 +158,20 @@ const Game = () => {
 		console.log('onsubmit tempName: ', tempName)
 		if ((playerN === '') & (allPlayers < 1)) {
 			console.log('assign P1')
-			playerN = 1
+			playerN = Number(1)
 		} else if ((playerN === '') & (allPlayers < 2)) {
 			console.log('assign P2')
-			playerN = 2
+			playerN = Number(2)
 		}
 		if ((playerN !== undefined) & (playerN !== '')) {
 			client.send(
 				JSON.stringify({
 					username: tempName,
 					type: 'userevent',
-					player: Number(playerN)
+					player: playerN
 				})
 			)
+			console.log('before send', playerN)
 			setPlayerNumber(playerN)
 			return
 		}
@@ -155,6 +188,18 @@ const Game = () => {
 				inputPos: position
 			})
 		)
+	}
+	const handleChatMessage = (msg) => {
+		console.log(msg)
+		client.send(
+			JSON.stringify({
+				username: userName,
+				player: Number(playerNumber),
+				type: 'chat',
+				msg: msg
+			})
+		)
+
 	}
 
 	///// Game Functions /////
@@ -196,7 +241,7 @@ const Game = () => {
 					<Container className="fieldContainer">
 						<Grid container>
 							<Grid item xs={6} className="playField1">
-								<Paper>
+								<Paper className={classes.paper}>
 									<RenderBoard
 										handleUserInput={(e, cellID) =>
 											handleUserInput(e, cellID)
@@ -233,7 +278,8 @@ const Game = () => {
 								</Paper>
 							</Grid>
 							<Grid item xs={6} className="playField2">
-								<Paper>
+								<Paper className={classes.paper}
+								>
 									<RenderBoard
 										handleUserInput
 										opponent="true"
@@ -244,7 +290,9 @@ const Game = () => {
 							</Grid>
 						</Grid>
 					</Container>
-					<Chat />
+					<Container>
+					<Chat userName={userName} client={client} history={messageHistory}onMessage={(msg) => handleChatMessage(msg)}/>
+					</Container>
 				</div>
 			)}
 		</div>
