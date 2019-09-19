@@ -49,7 +49,6 @@ export const NewSquare = (props) => {
 			)
 		}
 	}
-	console.log('p2 ', props.opponentValues, 'p1 ', props.inputValue)
 	return <div className="squareWrapper">{field}</div>
 }
 export default NewSquare

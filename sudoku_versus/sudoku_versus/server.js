@@ -18,7 +18,8 @@ const WebSocketSrv = () => {
 	let userActivity = []
 	let gameField1 = {}
 	let gameField2 = {}
-	let messageHistory = []
+	let messageHistory = ['Server: Hey Players 👋,The game starts as soon as both players joined. To fill in a field simply click it and start typing, players have the option to reset their own field.',
+					'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. ']
 	let playersReady = 0 //todo array with players
 	const reqTypes = {
 		USER_EVENT: 'userevent',
@@ -121,6 +122,13 @@ const WebSocketSrv = () => {
 					playersReady: playersReady,
 					userActivity
 				} //add user +activity to the data of our response
+				let msg = {type: 'chat'}
+				msg.data={chat: [
+					'Server: Hey Players 👋,The game starts as soon as both players joined. To fill in a field simply click it and start typing, players have the option to reset their own field.',
+					'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. '
+					]}
+				console.log(msg)
+				sendMessage(JSON.stringify(msg))
 			}
 			if (dataFromClient.type === reqTypes.RESET) {
 				userActivity.push(
