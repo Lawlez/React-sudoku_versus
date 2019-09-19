@@ -3,10 +3,7 @@ import React, {useEffect, useState} from 'react'
 import MyButton from './button'
 export const Timer = (props) => {
 	const [timer, setTimer] = useState(0)
-	const [isActive, setIsActive] = useState(false)
-	if (props.timerStart) {
-		setIsActive(true)
-	}
+	const [isActive, setIsActive] = useState(props.timerStart)
 
 	useEffect(() => {
 		let interval

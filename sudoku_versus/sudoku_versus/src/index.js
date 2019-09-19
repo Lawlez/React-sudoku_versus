@@ -52,7 +52,7 @@ const Game = () => {
 	const [messageHistory, setMessageHistory] = useState([])
 	//let messageHistory = []
 	let dataFromServer
-	console.log(playerNumber)
+	console.log('Players rdy: ', allPlayers)
 	////////// Websocket functions start///////////////////
 	client.onopen = () => {
 		console.log('WebSocket Client Connected to server')
@@ -61,10 +61,9 @@ const Game = () => {
 		console.log('WebSocket server closing or offline...')
 	}
 	client.onmessage = (message) => {
-		console.log(allPlayers)
 		dataFromServer = JSON.parse(message.data)
 		console.log('im RECIEVING parsed: ', dataFromServer)
-		console.log('im player', playerNumber)
+		console.log('im player ', playerNumber)
 
 		if (dataFromServer.type === 'info') {
 			if (dataFromServer.players) {
@@ -76,7 +75,7 @@ const Game = () => {
 			/* ON USEREVENT*/
 
 			let index = dataFromServer.data.userActivity.length - 1
-			console.log(dataFromServer.data.userActivity[index])
+			console.log('UserActivity index: ',dataFromServer.data.userActivity[index])
 			let newestActivity = [
 				...userActivity,
 				dataFromServer.data.userActivity[index]
@@ -115,11 +114,8 @@ const Game = () => {
 			setMessageHistory([...dataFromServer.data.chat])
 			console.log('index history ', messageHistory)
 		}
-		console.log(dataFromServer.data.player, 'comp', playerNumber)
-
+		
 		if (dataFromServer.type === 'gamemove') {
-			//TODO handle server response for game moves
-			//if(!isActive){setIsActive(!isActive)}
 			if (playerNumber === 'spectator') {
 				if (dataFromServer.field) {
 					console.log('spectator hey')
@@ -141,6 +137,12 @@ const Game = () => {
 		}
 
 		if (dataFromServer.type === 'attack') {
+			let index = dataFromServer.data.userActivity.length - 1
+			let newestActivity = [
+				...userActivity,
+				dataFromServer.data.userActivity[index]
+			]
+			setUserActivity(newestActivity)
 			//TODO handle server response for attacks
 		}
 	}
@@ -213,10 +215,18 @@ const Game = () => {
 		console.log('TODO end game function')
 	}
 	const launchAttack = () => {
-		console.log('TODO launch attack function')
+		client.send(
+			JSON.stringify({
+				username: userName,
+				player: Number(playerNumber),
+				type: 'attack'
+			})
+		)
 	}
 	////// end Game Functions /////
 
+	console.log('Is evryone READY TO  MF PLAY')
+	console.log(allPlayers === 2)
 	return (
 		<div className="game">
 			<Container>
@@ -233,7 +243,7 @@ const Game = () => {
 			) : (
 				<div>
 					<Container>
-						<Timer />
+						<Timer timerStart={allPlayers === 2} />
 					</Container>
 					<Container className="fieldContainer">
 						<Grid container>

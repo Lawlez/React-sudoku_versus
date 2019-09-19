@@ -28,6 +28,13 @@ const WebSocketSrv = () => {
 		RESET: 'resetgame',
 		CHAT: 'chat'
 	}
+	const attackTypes = {
+			STROBO: 'stroboscope',
+			DELETE: 'delete random entry',
+			SHAKE: 'shakes the playfield',
+			SWITCH: 'switches playfield values',
+			MEME: 'display distracting memes & gifs'
+	}
 
 	// generates unique userid for everyuser.
 	const getUniqueID = () => {
@@ -198,10 +205,28 @@ const WebSocketSrv = () => {
 					}
 				}
 			}
-
-			//TODO if ATTACK
+			if (dataFromClient.type === reqTypes.ATTACK) {
+				
+				const randomAttack = (obj)=>{
+					let attackKey = Object.keys(obj)
+					return obj[attackKey[attackKey.length * Math.random() << 0]]
+				}
+				let currentAttack = randomAttack(attackTypes)
+				console.log(currentAttack)
+				userActivity.push(
+					`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
+				)
+				json.data = {
+						user: users[userID],
+						player: dataFromClient.player,
+						attack: currentAttack,
+						userActivity
+					}
+			}
+		
 			if (json.type === 'gamemove') {
 				sendGameMove(json)
+				return
 			}
 			console.log('Message i sent to client: ', json)
 			sendMessage(JSON.stringify(json))

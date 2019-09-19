@@ -8,6 +8,10 @@ const InputField = (props) => {
 	}, [props])
 	//console.log(props.value)
 	const checkValue = (input) => {
+		if (input === '') {
+			setValue('')
+			console.log('deleted value')
+		}
 		if (input) {
 			if (isNaN(input)) {
 				//check if input is a number
