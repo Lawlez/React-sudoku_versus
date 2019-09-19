@@ -10,6 +10,8 @@ const Login = (props) => {
 				<input
 					type="text"
 					//value={props.uName}
+					
+						placeholder="username"
 					onChange={(e) => props.handleUserInput(e.target.value)}
 				/>
 				<MyButton

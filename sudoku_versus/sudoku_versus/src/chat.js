@@ -52,8 +52,14 @@ export const Chat = (props) => {
 	console.log('message history:', messageHistory)
 
 	useEffect(() => {
+		autoScroll('chat')
 		setMessageHistory(props.history)
 	}, [props])
+
+	const autoScroll = (id) => {
+		let element = document.getElementById(id)
+		element.scrollTop = element.scrollHeight
+	}
 
 	const hstryLength = () => {
 		return props.history.length
@@ -80,7 +86,8 @@ export const Chat = (props) => {
 					<Typography className={classes.title}>
 						spectator Chat
 					</Typography>
-					<List className={classes.root}>
+					<List className={classes.root} id="chat"
+					>
 						{props.history.map((item) => (
 							<ListItem
 								key={`item${hstryLength() *
