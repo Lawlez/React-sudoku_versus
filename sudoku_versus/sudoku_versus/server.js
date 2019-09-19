@@ -13,7 +13,7 @@ const WebSocketSrv = () => {
 
 	const clients = {}
 	const users = {}
-	let spectators={}
+	let spectators = {}
 	let players = {}
 	let userActivity = []
 	let gameField1 = {}
@@ -44,20 +44,18 @@ const WebSocketSrv = () => {
 		})
 	}
 	const sendGameMove = (json) => {
-		Object.keys(players).map((player)=>{
+		Object.keys(players).map((player) => {
 			console.log('plapyersend', player)
 			players[player].sendUTF(JSON.stringify(json))
 		})
 		json.field = {
 			gamefield1: gameField1,
 			gamefield2: gameField2
-
 		}
-		Object.keys(spectators).map((spectator)=>{
+		Object.keys(spectators).map((spectator) => {
 			console.log('spectatorsend', spectator)
 			spectators[spectator].sendUTF(JSON.stringify(json))
 		})
-		
 	}
 
 	wsServer.on('request', function(request) {
@@ -112,8 +110,10 @@ const WebSocketSrv = () => {
 					playersReady++
 				}
 				let currClient = clients[userID]
-				if (dataFromClient.player === 'spectator') {spectators= {...spectators, spectator: currClient}}
-					console.log('spectators: ',spectators)
+				if (dataFromClient.player === 'spectator') {
+					spectators = {...spectators, spectator: currClient}
+				}
+				console.log('spectators: ', spectators)
 				json.data = {
 					username: users[userID],
 					userid: userID,
@@ -141,7 +141,10 @@ const WebSocketSrv = () => {
 
 			if (dataFromClient.type === reqTypes.CHAT) {
 				console.log(dataFromClient.msg)
-				messageHistory = [ ...messageHistory,`${users[userID]}: ${dataFromClient.msg}`]
+				messageHistory = [
+					...messageHistory,
+					`${users[userID]}: ${dataFromClient.msg}`
+				]
 				json.data = {
 					username: users[userID],
 					'user-id': userID,
@@ -189,7 +192,9 @@ const WebSocketSrv = () => {
 			}
 
 			//TODO if ATTACK
-			if (json.type === 'gamemove') {sendGameMove(json)}
+			if (json.type === 'gamemove') {
+				sendGameMove(json)
+			}
 			console.log('Message i sent to client: ', json)
 			sendMessage(JSON.stringify(json))
 		})
@@ -200,7 +205,9 @@ const WebSocketSrv = () => {
 			let userLeft = users[userID] && users[userID].username
 			userActivity.push(`${userLeft} left the Game`)
 			json.data = {users, userActivity}
-			if (playersReady > 0 ){playersReady--}
+			if (playersReady > 0) {
+				playersReady--
+			}
 			//todo if player leaves remove from array
 			delete clients[userID]
 			delete users[userID]

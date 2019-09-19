@@ -25,19 +25,19 @@ export const fields = [
 	[null, null, null, 3, null, null, 4, 7, null],
 	[6, 4, 1, null, 5, 2, null, null, null]
 ]
-const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    padding: theme.spacing(2),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
-  button: {
-    margin: theme.spacing(1),
-  },
-}));
+const useStyles = makeStyles((theme) => ({
+	root: {
+		flexGrow: 1
+	},
+	paper: {
+		padding: theme.spacing(2),
+		textAlign: 'center',
+		color: theme.palette.text.secondary
+	},
+	button: {
+		margin: theme.spacing(1)
+	}
+}))
 
 const Game = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false) //toggle logiin
@@ -48,11 +48,11 @@ const Game = () => {
 	const [playerNumber, setPlayerNumber] = useState('')
 	const [tempName, setTempName] = useState('')
 	const [allPlayers, setAllPlayers] = useState(0)
-	const classes = useStyles();
+	const classes = useStyles()
 	const [messageHistory, setMessageHistory] = useState([])
 	//let messageHistory = []
 	let dataFromServer
-console.log(playerNumber)
+	console.log(playerNumber)
 	////////// Websocket functions start///////////////////
 	client.onopen = () => {
 		console.log('WebSocket Client Connected to server')
@@ -113,7 +113,7 @@ console.log(playerNumber)
 
 		if (dataFromServer.type === 'chat') {
 			setMessageHistory([...dataFromServer.data.chat])
-			console.log('index history ',messageHistory)
+			console.log('index history ', messageHistory)
 		}
 		console.log(dataFromServer.data.player, 'comp', playerNumber)
 
@@ -121,25 +121,23 @@ console.log(playerNumber)
 			//TODO handle server response for game moves
 			//if(!isActive){setIsActive(!isActive)}
 			if (playerNumber === 'spectator') {
-
-			if (dataFromServer.field) {
-				console.log('spectator hey')
-				setFieldInput(dataFromServer.field.gamefield1)
-				setOpponentFields(dataFromServer.field.gamefield2)
-			}
-			}else{
+				if (dataFromServer.field) {
+					console.log('spectator hey')
+					setFieldInput(dataFromServer.field.gamefield1)
+					setOpponentFields(dataFromServer.field.gamefield2)
+				}
+			} else {
 				if (dataFromServer.data.player === playerNumber) {
-				console.log('I made a move')
+					console.log('I made a move')
 
-				setFieldInput(dataFromServer.data.gamefield)
-				console.log(fieldInput)
-			} else{
-				console.log('OPPONENT made a move')
-				setOpponentFields(dataFromServer.data.gamefield)
-				console.log(opponentFields)
+					setFieldInput(dataFromServer.data.gamefield)
+					console.log(fieldInput)
+				} else {
+					console.log('OPPONENT made a move')
+					setOpponentFields(dataFromServer.data.gamefield)
+					console.log(opponentFields)
+				}
 			}
-			}
-			
 		}
 
 		if (dataFromServer.type === 'attack') {
@@ -199,7 +197,6 @@ console.log(playerNumber)
 				msg: msg
 			})
 		)
-
 	}
 
 	///// Game Functions /////
@@ -278,8 +275,7 @@ console.log(playerNumber)
 								</Paper>
 							</Grid>
 							<Grid item xs={6} className="playField2">
-								<Paper className={classes.paper}
-								>
+								<Paper className={classes.paper}>
 									<RenderBoard
 										handleUserInput
 										opponent="true"
@@ -291,7 +287,12 @@ console.log(playerNumber)
 						</Grid>
 					</Container>
 					<Container>
-					<Chat userName={userName} client={client} history={messageHistory}onMessage={(msg) => handleChatMessage(msg)}/>
+						<Chat
+							userName={userName}
+							client={client}
+							history={messageHistory}
+							onMessage={(msg) => handleChatMessage(msg)}
+						/>
 					</Container>
 				</div>
 			)}

@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
 		position: 'relative',
 		overflow: 'auto',
 		maxHeight: 220,
-		minHeight:220
+		minHeight: 220
 	},
 	listSection: {
 		backgroundColor: 'inherit'
@@ -55,21 +55,22 @@ export const Chat = (props) => {
 		setMessageHistory(props.history)
 	}, [props])
 
-	const hstryLength = () =>{
+	const hstryLength = () => {
 		return props.history.length
 	}
 	const handleChatMessage = (e) => {
-		if (!userMessage) {return console.log('message cannot be emtpy')}
+		if (!userMessage) {
+			return console.log('message cannot be emtpy')
+		}
 		//setMessageHistory([`${usr}: ${userMessage}`, ...messageHistory])
-		
+
 		props.onMessage(userMessage)
 		setUserMessage('')
 	}
 	const handleEnterMessage = (e) => {
 		if (e.keyCode === 13 || e.which === 13) {
-		handleChatMessage()
-	}
-
+			handleChatMessage()
+		}
 	}
 	console.log(props.history)
 	return (
@@ -80,16 +81,13 @@ export const Chat = (props) => {
 						spectator Chat
 					</Typography>
 					<List className={classes.root}>
-						
-									{props.history.map((item) => ( 
-										<ListItem
-											key={`item${hstryLength()*Math.random()}-${item}${hstryLength()}`}
-										>
-											<ListItemText
-												primary={`${item}`}
-											/>
-										</ListItem>
-						
+						{props.history.map((item) => (
+							<ListItem
+								key={`item${hstryLength() *
+									Math.random()}-${item}${hstryLength()}`}
+							>
+								<ListItemText primary={`${item}`} />
+							</ListItem>
 						))}
 					</List>
 				</CardContent>
@@ -102,7 +100,6 @@ export const Chat = (props) => {
 						margin="normal"
 						variant="outlined"
 						value={userMessage}
-						
 						onChange={(e) => setUserMessage(e.target.value)}
 						onKeyPress={(e) => handleEnterMessage(e)}
 					/>

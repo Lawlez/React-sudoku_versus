@@ -44,7 +44,7 @@ code {
 }
 
 .playField1 {
-	display:inline-flex;
+	display: inline-flex;
 	width: 510px;
 }
 
@@ -54,8 +54,8 @@ code {
 }
 
 .playField2 .immutable {
-	color:#fff;
-	border-color:#d81b60!important;
+	color: #fff;
+	border-color: #d81b60 !important;
 	background: #f50057 !important;
 }
 
@@ -66,14 +66,14 @@ code {
 }
 
 .immutable {
-	color:#fff;
+	color: #fff;
 	background: #3f51b5;
-	border:2px solid #3949ab;
+	border: 2px solid #3949ab;
 }
 
 .timer {
 	border: 2px solid #000;
-	width:auto;
+	width: auto;
 	max-width: 130px;
 	padding: 5px;
 	margin-bottom: 20px;
@@ -108,7 +108,7 @@ code {
 }
 
 .userActivity {
-	display:flex;
+	display: flex;
 	padding: 2px;
 	background-color: #f6f6f6;
 	width: auto;

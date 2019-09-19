@@ -1,16 +1,14 @@
+import React, {useEffect, useState} from 'react'
 
-import React,  { useEffect, useState}from 'react';
-
-const InputField = (props) =>{
-
-	const [value, setValue] =  useState(props.value)
+const InputField = (props) => {
+	const [value, setValue] = useState(props.value)
 
 	useEffect(() => {
 		setValue(props.value)
 	}, [props])
 	//console.log(props.value)
-	const checkValue=(input)=>{
-	if (input) {
+	const checkValue = (input) => {
+		if (input) {
 			if (isNaN(input)) {
 				//check if input is a number
 				alert('Bitte Geben Sie eine ZAHL ein')
@@ -31,12 +29,16 @@ const InputField = (props) =>{
 			setValue(input)
 			props.onCorrectInput(Number(input))
 		}
-}
+	}
 
-return (
-<input type="text" readOnly={props.readOnly} 
- className={`square ${props.extraClass}`} value={value ? value : ''} onChange={(e) => checkValue(e.target.value) } />
-)
-
+	return (
+		<input
+			type="text"
+			readOnly={props.readOnly}
+			className={`square ${props.extraClass}`}
+			value={value ? value : ''}
+			onChange={(e) => checkValue(e.target.value)}
+		/>
+	)
 }
 export default InputField
