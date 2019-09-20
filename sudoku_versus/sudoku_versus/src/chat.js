@@ -2,10 +2,8 @@
 import Card from '@material-ui/core/Card'
 import CardActions from '@material-ui/core/CardActions'
 import CardContent from '@material-ui/core/CardContent'
-import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
-import Send from '@material-ui/icons/Send'
 import React, {useState, useEffect} from 'react'
 import List from '@material-ui/core/List'
 import ListItem from '@material-ui/core/ListItem'
@@ -110,16 +108,6 @@ export const Chat = (props) => {
 						onChange={(e) => setUserMessage(e.target.value)}
 						onKeyPress={(e) => handleEnterMessage(e)}
 					/>
-					<Button
-						size="large"
-						variant="outlined"
-						color="secondary"
-						aria-label="send"
-						className={classes.button}
-						onClick={(e) => handleChatMessage()}
-					>
-						<Send />
-					</Button>
 				</CardActions>
 			</Card>
 		</Container>

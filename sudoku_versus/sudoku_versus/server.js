@@ -5,23 +5,25 @@ const WebSocketSrv = () => {
 	const webSocketServerPort = 8080
 	const webSocketServer = require('websocket').server
 	const http = require('http')
-	const solve = require('@mattflow/sudoku-solver')
+	const klsudoku = require('klsudoku')
 	// starting the http server and the websocket server.
 	const server = http.createServer()
 	server.listen(webSocketServerPort)
 	const wsServer = new webSocketServer({httpServer: server})
-
-	const clients = {}
-	const users = {}
-	let spectators = {}
-	let players = {}
+	const clients = {} //keeps track of connected clients
+	const users = {} //obj keeps track of ALL USERS
+	let spectators = {} //obj keeps track of SPECTATORS
+	let players = {} //obj that keeps track of PLAYERS
 	let userActivity = []
-	let gameField1 = {}
-	let gameField2 = {}
-	let messageHistory = ['Server: Hey Players 👋,The game starts as soon as both players joined. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
-					'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. ']
-	let playersReady = 0 //todo array with players
+	let gameField1 = {} //PLayer 1 values
+	let gameField2 = {} //Player 2 Values
+	let messageHistory = [
+		'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
+		'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys'
+	]
+	let playersReady = 0 //count if both players are ready
 	const reqTypes = {
+		//defining user request types
 		USER_EVENT: 'userevent',
 		GAME_MOVE: 'gamemove',
 		ATTACK: 'attack',
@@ -29,12 +31,84 @@ const WebSocketSrv = () => {
 		CHAT: 'chat'
 	}
 	const attackTypes = {
-			STROBO: 'stroboscope',
-			DELETE: 'delete random entry',
-			SHAKE: 'shakes the playfield',
-			SWITCH: 'switches playfield values',
-			MEME: 'display distracting memes & gifs'
+		//defining attack types
+		STROBO: 'stroboscope',
+		DELETE: 'delete random entry',
+		SHAKE: 'shakes the playfield',
+		SWITCH: 'switches playfield values',
+		MEME: 'display distracting memes & gifs'
 	}
+	////////TIMER FUNCTION///////////
+	let playTimer = 0
+	let startTime
+	const gameTimer = () => {
+				playTimer = playTimer + 1
+				playTimer.toFixed(3)
+				console.log(playTimer) ///wait 1 seconds until cleint is rdy to recieve
+				sendMessage(JSON.stringify({type: 'time', time: playTimer}))
+	}
+	if (playersReady === 2) {
+		startTime = setInterval(gameTimer, 1000)
+	}
+	if (playersReady <= 2) {
+		clearInterval(startTime)
+	}
+	/////////////////////////////////
+
+	//TODO SOLVER & GENERATOR
+	let result = klsudoku.generate()
+	console.log(result)
+	let {puzzle, solution} = result;
+result = klsudoku.solve(puzzle);
+console.log(`puzzle:${puzzle}\nsolution:${solution}\n`);
+console.log('solve() return:'+result.solution);
+
+let puzzle1 =puzzle.slice(0,8)
+let puzzle2 =puzzle.slice(9,18)
+let puzzle3 =puzzle.slice(19,28)
+let puzzle4 =puzzle.slice(29,38)
+let puzzle5 =puzzle.slice(39,48)
+let puzzle6 =puzzle.slice(49,58)
+let puzzle7 =puzzle.slice(59,68)
+let puzzle8 =puzzle.slice(69,78)
+let Board = [
+[puzzle1],
+[puzzle2],
+[puzzle3],
+[puzzle4],
+[puzzle5],
+[puzzle6],
+[puzzle7],
+[puzzle8],
+
+]
+console.log(Board)
+
+	const handleAttacks = (dataFromClient) => {
+
+	const randomAttack = (obj) => {
+		let attackKey = Object.keys(obj)
+		return obj[attackKey[(attackKey.length * Math.random()) << 0]]
+	}
+
+	let currentAttack = randomAttack(attackTypes)
+	console.log(currentAttack)
+
+	userActivity.push(
+		`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
+	)
+	let json
+	json= {type: 'attack'}
+	json.data = {
+		user: dataFromClient.username,
+		player: dataFromClient.player,
+		attack: currentAttack,
+		userActivity
+	}
+	console.log(json)
+	sendMessage(JSON.stringify(json))
+}
+	
 
 	// generates unique userid for everyuser.
 	const getUniqueID = () => {
@@ -44,13 +118,14 @@ const WebSocketSrv = () => {
 				.substring(1)
 		return s4() + '-' + s4()
 	}
-
+	///////// SENDING GENERAL RESPONSES /////////////
 	const sendMessage = (json) => {
 		// We are sending the current data to all connected clients
 		Object.keys(clients).map((client) => {
 			clients[client].sendUTF(json)
 		})
 	}
+	//// SeNDING RESPONSE TO GAME MOVES ////////
 	const sendGameMove = (json) => {
 		Object.keys(players).map((player) => {
 			console.log('plapyersend', player)
@@ -75,6 +150,7 @@ const WebSocketSrv = () => {
 				'.'
 		)
 		let json = {
+			//send initial info on connect(how many PLAYERS connected)
 			type: 'info',
 			players: playersReady
 		}
@@ -93,6 +169,7 @@ const WebSocketSrv = () => {
 			const dataFromClient = JSON.parse(message.utf8Data)
 			const json = {type: dataFromClient.type} //prepare answer with same type as request
 
+			//////////////////HANDLING LOGIN AND USER_EVENT //////////////////
 			if (dataFromClient.type === reqTypes.USER_EVENT) {
 				//TODO : chekc if username exists
 				for (let keys in users) {
@@ -130,13 +207,16 @@ const WebSocketSrv = () => {
 					userActivity
 				} //add user +activity to the data of our response
 				let msg = {type: 'chat'}
-				msg.data={chat: [
-					'Server: Hey Players 👋,The game starts as soon as both players joined. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
-					'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. '
-					]}
+				msg.data = {
+					chat: [
+						'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
+						'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. '
+					]
+				}
 				console.log(msg)
-				sendMessage(JSON.stringify(msg))
+				sendMessage(JSON.stringify(msg)) //sending game instructions directly to chat
 			}
+			//////////////////HANDLING RESET //////////////////
 			if (dataFromClient.type === reqTypes.RESET) {
 				userActivity.push(
 					`${dataFromClient.username} RESET the Game as Player ${dataFromClient.player} with UID ${userID}`
@@ -153,9 +233,25 @@ const WebSocketSrv = () => {
 					userActivity
 				} //add user +activity to the data of our response
 			}
-
+			//////////////////HANDLING CHAT//////////////////
 			if (dataFromClient.type === reqTypes.CHAT) {
 				console.log(dataFromClient.msg)
+				
+				if (dataFromClient.msg === '/start') {
+					console.log('/start detected')
+					startTime = setInterval(gameTimer, 1000)
+				}
+				if (dataFromClient.msg === '/stop') {
+					console.log('/stop detected')
+					console.log(startTime)
+					clearInterval(startTime)
+				}
+				if (dataFromClient.msg === '/attack') {
+					console.log('/attack detected')
+					handleAttacks(dataFromClient)
+				}	
+					
+				
 				messageHistory = [
 					...messageHistory,
 					`${users[userID]}: ${dataFromClient.msg}`
@@ -167,7 +263,7 @@ const WebSocketSrv = () => {
 					chat: messageHistory
 				} //add user +activity to the data of our response
 			}
-
+			////////////////// HANDLE GAME_MOVES //////////////////
 			if (dataFromClient.type === reqTypes.GAME_MOVE) {
 				console.log(
 					dataFromClient.player,
@@ -205,11 +301,13 @@ const WebSocketSrv = () => {
 					}
 				}
 			}
+			///////////////HANDLE ATTACKS ////////////////////
 			if (dataFromClient.type === reqTypes.ATTACK) {
-				
-				const randomAttack = (obj)=>{
+				const randomAttack = (obj) => {
 					let attackKey = Object.keys(obj)
-					return obj[attackKey[attackKey.length * Math.random() << 0]]
+					return obj[
+						attackKey[(attackKey.length * Math.random()) << 0]
+					]
 				}
 				let currentAttack = randomAttack(attackTypes)
 				console.log(currentAttack)
@@ -217,13 +315,13 @@ const WebSocketSrv = () => {
 					`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
 				)
 				json.data = {
-						user: users[userID],
-						player: dataFromClient.player,
-						attack: currentAttack,
-						userActivity
-					}
+					user: users[userID],
+					player: dataFromClient.player,
+					attack: currentAttack,
+					userActivity
+				}
 			}
-		
+			////////////SENDING RESPONSES ////////////////////
 			if (json.type === 'gamemove') {
 				sendGameMove(json)
 				return
@@ -231,7 +329,7 @@ const WebSocketSrv = () => {
 			console.log('Message i sent to client: ', json)
 			sendMessage(JSON.stringify(json))
 		})
-
+		///////// ON CLOSE ///////////////
 		connection.on('close', function(connection) {
 			console.log(new Date() + ' Peer ' + userID + ' disconnected.')
 			const json = {type: reqTypes.USER_EVENT}

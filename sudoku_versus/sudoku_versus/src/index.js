@@ -61,6 +61,7 @@ const Game = () => {
 		console.log('WebSocket server closing or offline...')
 	}
 	client.onmessage = (message) => {
+		console.log(message)
 		dataFromServer = JSON.parse(message.data)
 		console.log('im RECIEVING parsed: ', dataFromServer)
 		console.log('im player ', playerNumber)
