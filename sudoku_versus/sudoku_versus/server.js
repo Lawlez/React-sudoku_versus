@@ -42,10 +42,10 @@ const WebSocketSrv = () => {
 	let playTimer = 0
 	let startTime
 	const gameTimer = () => {
-				playTimer = playTimer + 1
-				playTimer.toFixed(3)
-				console.log(playTimer) ///wait 1 seconds until cleint is rdy to recieve
-				sendMessage(JSON.stringify({type: 'time', time: playTimer}))
+		playTimer = playTimer + 1
+		playTimer.toFixed(3)
+		console.log(playTimer) ///wait 1 seconds until cleint is rdy to recieve
+		sendMessage(JSON.stringify({type: 'time', time: playTimer}))
 	}
 	if (playersReady === 2) {
 		startTime = setInterval(gameTimer, 1000)
@@ -56,59 +56,66 @@ const WebSocketSrv = () => {
 	/////////////////////////////////
 
 	//TODO SOLVER & GENERATOR
-	let result = klsudoku.generate()
-	console.log(result)
-	let {puzzle, solution} = result;
-result = klsudoku.solve(puzzle);
-console.log(`puzzle:${puzzle}\nsolution:${solution}\n`);
-console.log('solve() return:'+result.solution);
+	let puzzle
+	let solution
+	const sudokuMaster = (sudoku) => {
+		if (sudoku) {
+			for (let keyid in sudoku) {
+				let key = keyid.replace('cell', '')
+				let rowid = key[0]
+				let cellid = key[1]
+				let userInputValue = sudoku[keyid]
+				let position = Number(rowid) * 9 + Number(cellid)
 
-let puzzle1 =puzzle.slice(0,8)
-let puzzle2 =puzzle.slice(9,18)
-let puzzle3 =puzzle.slice(19,28)
-let puzzle4 =puzzle.slice(29,38)
-let puzzle5 =puzzle.slice(39,48)
-let puzzle6 =puzzle.slice(49,58)
-let puzzle7 =puzzle.slice(59,68)
-let puzzle8 =puzzle.slice(69,78)
-let Board = [
-[puzzle1],
-[puzzle2],
-[puzzle3],
-[puzzle4],
-[puzzle5],
-[puzzle6],
-[puzzle7],
-[puzzle8],
+				console.log(position)
+				console.log(
+					`${userInputValue} verglichen mit  ${solution[position]}`
+				)
+				if (userInputValue !== solution[position]) {
+					alert('come on, you can do better than that!')
+					return
+				}
+			}
+		} else {
+			let result = klsudoku.generate()
+			console.log(result)
+			puzzle = result.puzzle
+			solution = result.solution
+			console.log(solution, puzzle)
+			result = klsudoku.solve(puzzle)
+			let tiles = puzzle.match(/.{1,9}/g)
+			let board = tiles.map((tile) =>
+				tile.split('').map((t) => (t === '.' ? null : Number(t)))
+			)
+			return board
+		}
 
-]
-console.log(Board)
+		console.log(board)
+	}
 
 	const handleAttacks = (dataFromClient) => {
+		const randomAttack = (obj) => {
+			let attackKey = Object.keys(obj)
+			return obj[attackKey[(attackKey.length * Math.random()) << 0]]
+		}
 
-	const randomAttack = (obj) => {
-		let attackKey = Object.keys(obj)
-		return obj[attackKey[(attackKey.length * Math.random()) << 0]]
+		let currentAttack = randomAttack(attackTypes)
+		console.log(currentAttack)
+
+		userActivity.push(
+			`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
+		)
+		let json
+		json = {type: 'attack'}
+		json.data = {
+			user: dataFromClient.username,
+			player: dataFromClient.player,
+			attack: currentAttack,
+			userActivity
+		}
+		console.log(json)
+		sendMessage(JSON.stringify(json))
 	}
-
-	let currentAttack = randomAttack(attackTypes)
-	console.log(currentAttack)
-
-	userActivity.push(
-		`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
-	)
-	let json
-	json= {type: 'attack'}
-	json.data = {
-		user: dataFromClient.username,
-		player: dataFromClient.player,
-		attack: currentAttack,
-		userActivity
-	}
-	console.log(json)
-	sendMessage(JSON.stringify(json))
-}
-	
 
 	// generates unique userid for everyuser.
 	const getUniqueID = () => {
@@ -152,7 +159,8 @@ console.log(Board)
 		let json = {
 			//send initial info on connect(how many PLAYERS connected)
 			type: 'info',
-			players: playersReady
+			players: playersReady,
+			board: sudokuMaster()
 		}
 		console.log(json)
 		setTimeout(function() {
@@ -236,7 +244,7 @@ console.log(Board)
 			//////////////////HANDLING CHAT//////////////////
 			if (dataFromClient.type === reqTypes.CHAT) {
 				console.log(dataFromClient.msg)
-				
+
 				if (dataFromClient.msg === '/start') {
 					console.log('/start detected')
 					startTime = setInterval(gameTimer, 1000)
@@ -246,12 +254,23 @@ console.log(Board)
 					console.log(startTime)
 					clearInterval(startTime)
 				}
+				if (dataFromClient.msg === '/newboard') {
+					console.log('/newboard detected')
+					let json = {
+						type: 'info',
+						players: playersReady,
+						board: sudokuMaster()
+					}
+					console.log(json)
+					setTimeout(function() {
+						sendMessage(JSON.stringify(json)) ///wait 200 mseconds until cleint is rdy to recieve
+					}, 200)
+				}
 				if (dataFromClient.msg === '/attack') {
 					console.log('/attack detected')
 					handleAttacks(dataFromClient)
-				}	
-					
-				
+				}
+
 				messageHistory = [
 					...messageHistory,
 					`${users[userID]}: ${dataFromClient.msg}`

@@ -15,7 +15,7 @@ const RenderBoard = (props) => {
 		let square = []
 		for (let id = 0; id < size; id++) {
 			let cellID = `cell${i}${id}`
-			let cellVal = fields[i][id]
+			let cellVal = props.fields[i][id]
 			square.push(
 				<NewSquare
 					handleUserInput={(e) => props.handleUserInput(e, cellID)}

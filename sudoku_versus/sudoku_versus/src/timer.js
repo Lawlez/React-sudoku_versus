@@ -1,27 +1,12 @@
 //Timer
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 import MyButton from './button'
 export const Timer = (props) => {
-	const [timer, setTimer] = useState(0)
-	const [isActive, setIsActive] = useState(props.timerStart)
-
-	useEffect(() => {
-		let interval
-
-		if (isActive) {
-			interval = setInterval(() => {
-				setTimer((timer) => timer + 1)
-			}, 1000)
-		} else if (!isActive && timer !== 0) {
-			clearInterval(interval)
-		}
-		return () => clearInterval(interval)
-	}, [isActive, timer])
-	let timerContent = timer + ' seconds'
+	
+	let timerContent = props.time + ' seconds'
 	//TODO timer function
 	return (<div>
 		<div className="timer">{timerContent}</div>
-		<MyButton/>
 		</div>
 )
 }

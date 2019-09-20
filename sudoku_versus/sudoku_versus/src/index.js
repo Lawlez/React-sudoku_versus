@@ -50,6 +50,8 @@ const Game = () => {
 	const [allPlayers, setAllPlayers] = useState(0)
 	const classes = useStyles()
 	const [messageHistory, setMessageHistory] = useState([])
+	const [time , setTime] = useState(0)
+	const [board, setBoard] = useState([])
 	//let messageHistory = []
 	let dataFromServer
 	console.log('Players rdy: ', allPlayers)
@@ -70,6 +72,13 @@ const Game = () => {
 			if (dataFromServer.players) {
 				setAllPlayers(dataFromServer.players)
 			}
+			if (dataFromServer.board) {
+				setBoard(dataFromServer.board)
+			}
+			return
+		}
+		if (dataFromServer.type === 'time') {
+			setTime(dataFromServer.time)
 			return
 		}
 		if (dataFromServer.type === 'userevent') {
@@ -244,13 +253,14 @@ const Game = () => {
 			) : (
 				<div>
 					<Container>
-						<Timer timerStart={allPlayers === 2} />
+						<Timer time={time} />
 					</Container>
 					<Container className="fieldContainer">
 						<Grid container>
 							<Grid item xs={6} className="playField1">
 								<Paper className={classes.paper}>
 									<RenderBoard
+									fields={board}
 										handleUserInput={(e, cellID) =>
 											handleUserInput(e, cellID)
 										}
@@ -288,6 +298,7 @@ const Game = () => {
 							<Grid item xs={6} className="playField2">
 								<Paper className={classes.paper}>
 									<RenderBoard
+									fields={board}
 										handleUserInput
 										opponent="true"
 										opponentFields={opponentFields}
