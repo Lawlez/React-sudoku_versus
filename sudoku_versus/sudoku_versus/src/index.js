@@ -122,6 +122,7 @@ const Game = () => {
 		}
 
 		if (dataFromServer.type === 'chat') {
+			console.log(dataFromServer)
 			setMessageHistory([...dataFromServer.data.chat])
 			console.log('index history ', messageHistory)
 		}
@@ -175,7 +176,7 @@ const Game = () => {
 							playerNumber,
 							tempName,
 							allPlayers,
-							setPlayerNumber()
+							setPlayerNumber
 						)
 					}
 					handleUserInput={(e) =>

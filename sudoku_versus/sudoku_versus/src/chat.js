@@ -49,7 +49,7 @@ export const Chat = (props) => {
 	const [userMessage, setUserMessage] = useState()
 	const [messageHistory, setMessageHistory] = useState(props.history)
 	const classes = useStyles()
-	console.log('message history:', messageHistory)
+	//console.log('message history:', messageHistory)
 
 	useEffect(() => {
 		autoScroll('chat')
@@ -68,8 +68,6 @@ export const Chat = (props) => {
 		if (!userMessage) {
 			return console.log('message cannot be emtpy')
 		}
-		//setMessageHistory([`${usr}: ${userMessage}`, ...messageHistory])
-
 		props.onMessage(userMessage)
 		setUserMessage('')
 	}
@@ -78,7 +76,7 @@ export const Chat = (props) => {
 			handleChatMessage()
 		}
 	}
-	console.log(props.history)
+	//console.log(props.history)
 	return (
 		<Container maxWidth="md">
 			<Card>

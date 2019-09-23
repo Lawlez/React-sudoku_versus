@@ -31,6 +31,7 @@ export const onSubmit = (playerNumber,tempName,allPlayers,setPlayerNumber) => {
 }
 
 export const sendMessage = (json) => {
+	
 	client.send(JSON.stringify(json))
 }
 ///// game move //////

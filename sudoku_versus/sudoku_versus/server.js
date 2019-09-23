@@ -1,10 +1,19 @@
 //server
 import http from 'http'
-//import chatHandler from './chatHandler'
-
+import chatHandler from './chatHandler'
+export const clients = {} //keeps track of connected clients
 const klsudoku = require('klsudoku')
-import {getBoard, sudokuMaster} from './sudokuHandler'
-const WebSocketSrv = () => {
+import sudokuHandler, {getBoard, sudokuMaster} from './sudokuHandler'
+
+///////// SENDING GENERAL RESPONSES /////////////
+	export const sendMessage = (json) => {
+		// We are sending the current data to all connected clients
+		Object.keys(clients).map((client) => {
+			clients[client].sendUTF(json)
+		})
+	}
+export let json = {}
+const WebSocketSrv = async () => {
 	const webSocketServerPort = 8080
 	const webSocketServer = require('websocket').server
 	const http = require('http')
@@ -12,7 +21,6 @@ const WebSocketSrv = () => {
 	const server = http.createServer()
 	server.listen(webSocketServerPort)
 	const wsServer = new webSocketServer({httpServer: server})
-	const clients = {} //keeps track of connected clients
 	const users = {} //obj keeps track of ALL USERS
 	let spectators = {} //obj keeps track of SPECTATORS
 	let players = {} //obj that keeps track of PLAYERS
@@ -20,12 +28,7 @@ const WebSocketSrv = () => {
 	let currentBoard
 	let gameField1 = {} //PLayer 1 values
 	let gameField2 = {} //Player 2 Values
-	const getinitialBoard = async () => {return await getBoard('easy')}
-	let initialBoard = getinitialBoard()
-	let messageHistory = [
-		'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
-		'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys'
-	]
+	let initialBoard// = getinitialBoard()
 	let playersReady = 0 //count if both players are ready
 	const reqTypes = {
 		//defining user request types
@@ -75,7 +78,6 @@ const WebSocketSrv = () => {
 		userActivity.push(
 			`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
 		)
-		let json
 		json = {type: 'attack'}
 		json.data = {
 			user: dataFromClient.username,
@@ -95,13 +97,7 @@ const WebSocketSrv = () => {
 				.substring(1)
 		return s4() + '-' + s4()
 	}
-	///////// SENDING GENERAL RESPONSES /////////////
-	const sendMessage = (json) => {
-		// We are sending the current data to all connected clients
-		Object.keys(clients).map((client) => {
-			clients[client].sendUTF(json)
-		})
-	}
+	
 	//// SeNDING RESPONSE TO GAME MOVES ////////
 	const sendGameMove = (json) => {
 		Object.keys(players).map((player) => {
@@ -126,10 +122,10 @@ const WebSocketSrv = () => {
 				request.origin +
 				'.'
 		)
-		if (currentBoard) {
+		if (!currentBoard) {
 			console.log("currentBoard", currentBoard);
 
-			initialBoard = currentBoard
+			initialBoard = await getBoard('easy')
 		}
 		let json = {
 			//send initial info on connect(how many PLAYERS connected)
@@ -144,11 +140,12 @@ const WebSocketSrv = () => {
 		const connection = request.accept(null, request.origin)
 		clients[userID] = connection
 		console.log('connected: ' + userID + ' in ' + clients)
+////^^SETUP
 
 		connection.on('message', async function(message) {
 			console.log('new Request: ', message)
 			const dataFromClient = JSON.parse(message.utf8Data)
-			const json = {type: dataFromClient.type} //prepare answer with same type as request
+			json = {type: dataFromClient.type} //prepare answer with same type as request
 
 			//////////////////HANDLING LOGIN AND USER_EVENT //////////////////
 			if (dataFromClient.type === reqTypes.USER_EVENT) {
@@ -216,94 +213,10 @@ const WebSocketSrv = () => {
 			}
 			//////////////////HANDLING CHAT//////////////////
 			if (dataFromClient.type === reqTypes.CHAT) {
-				//chatHandler(dataFromClient,messageHistory, currentBoard, klsudoku, users, userID, json, sudokuHandler, playersReady)
-				console.log(dataFromClient.msg)
-				if (dataFromClient.msg === '/start') {
-					console.log('/start detected')
-					startTime = setInterval(gameTimer, 1000)
-				}
-				if (dataFromClient.msg === '/stop') {
-					console.log('/stop detected')
-					console.log(startTime)
-					clearInterval(startTime)
-				}
-				if (
-					(dataFromClient.msg === '/newboard') |
-					(dataFromClient.msg === '/newboard easy')
-				) {
-					console.log('/newboard detected')
-					currentBoard = await getBoard('easy')
-					let json = {
-						type: 'info',
-						players: playersReady,
-						board: currentBoard
-					}
-					console.log(json)
-					sendMessage(JSON.stringify(json))
-				}
-				if (dataFromClient.msg === '/newboard medium') {
-					console.log('/newboard detected')
-					currentBoard = await getBoard('medium')
-					let json = {
-						type: 'info',
-						players: playersReady,
-						board: currentBoard
-					}
-					console.log(json)
-					sendMessage(JSON.stringify(json))
-				}
-				if (dataFromClient.msg === '/newboard hard') {
-					console.log('/newboard detected')
-					currentBoard = await getBoard('hard')
-					let json = {
-						type: 'info',
-						players: playersReady,
-						board: currentBoard
-					}
-					console.log(json)
-					sendMessage(JSON.stringify(json))
-				}
-				if (dataFromClient.msg === '/solve') {
-					console.log('/solve detected')
-					let solverMask = [].concat(...currentBoard)
-					console.log('mask', solverMask)
-					solverMask = solverMask.toString()
-					solverMask = solverMask.replace(/,/g, '')
-					console.log('stringmask', solverMask)
-					solution = klsudoku.solve(solverMask)
-					solution = solution.solution
-					let tiles = solution.match(/.{1,9}/g)
-					let board = tiles.map((tile) =>
-						tile.split('').map((t) => Number(t))
-					)
-					console.log('sol var', solution)
-					let json = {
-						type: 'gamemove'
-					}
-					json.data = {
-						username: users[userID],
-						player: 1,
-						gamefield: board
-					}
-					console.log(json)
-					sendMessage(JSON.stringify(json))
-				}
-				if (dataFromClient.msg === '/attack') {
-					console.log('/attack detected')
-					handleAttacks(dataFromClient)
-				}
-
-				messageHistory = [
-					...messageHistory,
-					`${users[userID]}: ${dataFromClient.msg}`
-				]
-				json.data = {
-					username: users[userID],
-					'user-id': userID,
-					player: dataFromClient.player,
-					chat: messageHistory
-				} //add user +activity to the data of our response
+				json = await chatHandler(dataFromClient,currentBoard, klsudoku, users, userID, sudokuHandler, playersReady)
+				
 			}
+				console.log('nach chat HANDLER',json)
 			////////////////// HANDLE GAME_MOVES //////////////////
 			if (dataFromClient.type === reqTypes.GAME_MOVE) {
 				console.log(
