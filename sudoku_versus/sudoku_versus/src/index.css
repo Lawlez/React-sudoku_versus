@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+	font-family: 'Roboto' sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -8,9 +8,6 @@ body {
 code {
 	font-family: source-code-pro, Consolas, monospace;
 }
-
-.squareWrapper {}
-
 .row div:nth-child(3) {
 	border-right: 3px solid #000;
 }
@@ -127,7 +124,6 @@ code {
 	position: absolute;
 	margin-top: -3px;
 	margin-left: -18px;
-
 }
 
 .poo {
@@ -179,7 +175,6 @@ code {
 		display: inline-flex;
 	}
 }
-
 /*fuck apples IOS overrides*/
 textarea,
 input[type="text"] .input-checkbox {

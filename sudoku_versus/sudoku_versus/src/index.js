@@ -11,8 +11,18 @@ import Timer from './timer'
 import Login from './login'
 import Chat from './chat'
 import './index.css'
+import {
+	handleUserNameInput,
+	onSubmit,
+	handleUserInput,
+	handleChatMessage,
+	resetGame,
+	endGame,
+	launchAttack,
+	deleteValue
+} from './handlers'
 
-const client = new W3CWebSocket('ws://192.168.100.211:8080')
+export const client = new W3CWebSocket('ws://192.168.100.211:8080')
 const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1
@@ -38,7 +48,7 @@ const Game = () => {
 	const [allPlayers, setAllPlayers] = useState(0)
 	const classes = useStyles()
 	const [messageHistory, setMessageHistory] = useState([])
-	const [time , setTime] = useState(0)
+	const [time, setTime] = useState(0)
 	const [board, setBoard] = useState([])
 	//let messageHistory = []
 	let dataFromServer
@@ -73,7 +83,10 @@ const Game = () => {
 			/* ON USEREVENT*/
 
 			let index = dataFromServer.data.userActivity.length - 1
-			console.log('UserActivity index: ',dataFromServer.data.userActivity[index])
+			console.log(
+				'UserActivity index: ',
+				dataFromServer.data.userActivity[index]
+			)
 			let newestActivity = [
 				...userActivity,
 				dataFromServer.data.userActivity[index]
@@ -112,7 +125,7 @@ const Game = () => {
 			setMessageHistory([...dataFromServer.data.chat])
 			console.log('index history ', messageHistory)
 		}
-		
+
 		if (dataFromServer.type === 'gamemove') {
 			if (playerNumber === 'spectator') {
 				if (dataFromServer.field) {
@@ -146,93 +159,6 @@ const Game = () => {
 	}
 	////////// Websocket functions end///////////////////
 
-	const handleUserNameInput = (e) => {
-		setTempName(e)
-		console.log(e)
-		console.log('before submit tempoName: ', tempName)
-	}
-	const onSubmit = () => {
-		let playerN = playerNumber
-		console.log('onsubmit tempName: ', tempName)
-		if ((playerN === '') & (allPlayers < 1)) {
-			console.log('assign P1')
-			playerN = Number(1)
-		} else if ((playerN === '') & (allPlayers < 2)) {
-			console.log('assign P2')
-			playerN = Number(2)
-		}
-		if ((playerN !== undefined) & (playerN !== '')) {
-			sendMessage({
-					username: tempName,
-					type: 'userevent',
-					player: playerN
-				})
-			console.log('before send', playerN)
-			setPlayerNumber(playerN)
-			return
-		}
-		console.log(playerNumber)
-		console.log('player not set')
-	}
-	const sendMessage = (json) =>{
-		client.send(JSON.stringify(json))
-	}
-	const handleUserInput = (input, position, player) => {
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'gamemove',
-				input: input,
-				inputPos: position
-			})
-		
-	}
-	const handleChatMessage = (msg) => {
-		console.log(msg)
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'chat',
-				msg: msg
-			})
-	}
-
-	///// Game Functions /////
-	const resetGame = () => {
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'resetgame'
-			})
-	}
-	const endGame = () => {
-		console.log('TODO end game function')
-		if (Object.keys(fieldInput).length < 30) {console.log('fill the board first bro')
-			return}
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'endgame'
-			})
-	}
-	const launchAttack = () => {
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'attack'
-			})
-	}
-	////// end Game Functions /////
-	const deleteValue = (cell) => {
-		sendMessage({
-				username: userName,
-				player: Number(playerNumber),
-				type: 'gamemove',
-				input: '',
-				inputPos: cell
-			})
-	}
-
 	console.log('Is evryone READY TO  MF PLAY')
 	console.log(allPlayers === 2)
 	return (
@@ -244,8 +170,17 @@ const Game = () => {
 			</Container>
 			{!isLoggedIn ? (
 				<Login
-					onSubmit={() => onSubmit()}
-					handleUserInput={(e) => handleUserNameInput(e)}
+					onSubmit={() =>
+						onSubmit(
+							playerNumber,
+							tempName,
+							allPlayers,
+							setPlayerNumber()
+						)
+					}
+					handleUserInput={(e) =>
+						handleUserNameInput(e, setTempName, tempName)
+					}
 					handlePlayerSelect={(e) => setPlayerNumber(e)}
 				/>
 			) : (
@@ -258,10 +193,21 @@ const Game = () => {
 							<Grid item xs={6} className="playField1">
 								<Paper className={classes.paper}>
 									<RenderBoard
-									deleteValue={(cell)=>deleteValue(cell)}
-									fields={board}
+										deleteValue={(cell) =>
+											deleteValue(
+												cell,
+												userName,
+												playerNumber
+											)
+										}
+										fields={board}
 										handleUserInput={(e, cellID) =>
-											handleUserInput(e, cellID)
+											handleUserInput(
+												e,
+												cellID,
+												userName,
+												playerNumber
+											)
 										}
 										inputValues={fieldInput}
 										opponentFields={opponentFields}
@@ -269,7 +215,12 @@ const Game = () => {
 									/>
 									{isNaN(playerNumber) ? (
 										<MyButton
-											onClick={() => launchAttack()}
+											onClick={() =>
+												launchAttack(
+													userName,
+													playerNumber
+												)
+											}
 											text="Attack"
 											color="secondary"
 										/>
@@ -277,14 +228,25 @@ const Game = () => {
 										<Grid container>
 											<Grid item xs={6}>
 												<MyButton
-													onClick={() => resetGame()}
+													onClick={() =>
+														resetGame(
+															userName,
+															playerNumber
+														)
+													}
 													text="reset"
 													color="default"
 												/>
 											</Grid>
 											<Grid item xs={6}>
 												<MyButton
-													onClick={() => endGame()}
+													onClick={() =>
+														endGame(
+															userName,
+															playerNumber,
+															fieldInput
+														)
+													}
 													text="i'm done!"
 													color="primary"
 												/>
@@ -297,7 +259,7 @@ const Game = () => {
 							<Grid item xs={6} className="playField2">
 								<Paper className={classes.paper}>
 									<RenderBoard
-									fields={board}
+										fields={board}
 										handleUserInput
 										opponent="true"
 										opponentFields={opponentFields}
@@ -312,7 +274,9 @@ const Game = () => {
 							userName={userName}
 							client={client}
 							history={messageHistory}
-							onMessage={(msg) => handleChatMessage(msg)}
+							onMessage={(msg) =>
+								handleChatMessage(msg, userName, playerNumber)
+							}
 						/>
 					</Container>
 				</div>

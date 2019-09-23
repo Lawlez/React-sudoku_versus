@@ -30,7 +30,7 @@ export const MyButton = (props) => {
 			color={props.color}
 			onClick={props.onClick}
 		>
-			{props.text}{' '}
+			{props.text}
 		</Button>
 	)
 }

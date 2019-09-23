@@ -1,12 +1,13 @@
 //server
-const fetch = require('node-fetch')
 import http from 'http'
-import chatHandler from './chatHandler'
+//import chatHandler from './chatHandler'
+
+const klsudoku = require('klsudoku')
+import {getBoard, sudokuMaster} from './sudokuHandler'
 const WebSocketSrv = () => {
 	const webSocketServerPort = 8080
 	const webSocketServer = require('websocket').server
 	const http = require('http')
-	const klsudoku = require('klsudoku')
 	// starting the http server and the websocket server.
 	const server = http.createServer()
 	server.listen(webSocketServerPort)
@@ -16,9 +17,11 @@ const WebSocketSrv = () => {
 	let spectators = {} //obj keeps track of SPECTATORS
 	let players = {} //obj that keeps track of PLAYERS
 	let userActivity = []
-	let currentBoard 
+	let currentBoard
 	let gameField1 = {} //PLayer 1 values
 	let gameField2 = {} //Player 2 Values
+	const getinitialBoard = async () => {return await getBoard('easy')}
+	let initialBoard = getinitialBoard()
 	let messageHistory = [
 		'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
 		'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys'
@@ -60,65 +63,6 @@ const WebSocketSrv = () => {
 
 	//TODO SOLVER & GENERATOR
 
-	let puzzle
-	let solution
-	if (currentBoard) {
-				let solverMask = [].concat(...currentBoard)
-				solution = klsudoku.solve(solverMask)
-			}
-	const sudokuMaster = (sudoku) => {
-		console.log('inside master')
-		if (sudoku) {//COMPARING USER INPU TO SOLUTION
-			console.log('sudoku true')
-			console.log(sudoku)
-			console.log(solution)
-			if (!solution) {
-				if (currentBoard) {
-				let solverMask = [].concat(...currentBoard)
-				solution = klsudoku.solve(solverMask)
-			}
-			}
-			for (let keyid in sudoku) {
-				let key = keyid.replace('cell', '')
-				let rowid = key[0]
-				let cellid = key[1]
-				let userInputValue = sudoku[keyid]
-				let position = Number(rowid) * 9 + Number(cellid)
-				console.log(position)
-				console.log(
-					`${userInputValue} verglichen mit  ${solution[position]}`
-				)
-				if (userInputValue !== solution[position]) {
-					console.log('values wrong')
-					return false
-				}
-			}
-		} else {//GENERATING LOCAL SUDOKU
-			let result = klsudoku.generate()
-			console.log(result)
-			puzzle = result.puzzle
-			solution = result.solution
-			result = klsudoku.solve(puzzle)
-			let tiles = puzzle.match(/.{1,9}/g)
-			let board = tiles.map((tile) =>
-				tile.split('').map((t) => (t === '.' ? null : Number(t)))
-			)
-			return board
-		}
-		return true
-	}
-//GET NEW BOARD FROM ONLINE API
-	const getBoard = (difficulty='easy') => {
-		return fetch(
-				`https://sugoku.herokuapp.com/board?difficulty=${difficulty}`
-			)
-				.then((response) => response.json())
-				.then((json) => {
-					currentBoard = json.board
-					return json.board
-				})
-				.catch(e => sudokuMaster()) //fall back to local generator in case API goes OFFLINE
-	}
 	const handleAttacks = (dataFromClient) => {
 		const randomAttack = (obj) => {
 			let attackKey = Object.keys(obj)
@@ -182,7 +126,11 @@ const WebSocketSrv = () => {
 				request.origin +
 				'.'
 		)
-		let initialBoard = await getBoard('easy')
+		if (currentBoard) {
+			console.log("currentBoard", currentBoard);
+
+			initialBoard = currentBoard
+		}
 		let json = {
 			//send initial info on connect(how many PLAYERS connected)
 			type: 'info',
@@ -268,93 +216,94 @@ const WebSocketSrv = () => {
 			}
 			//////////////////HANDLING CHAT//////////////////
 			if (dataFromClient.type === reqTypes.CHAT) {
-				//chatHandler(dataFromClient,messageHistory, currentBoard, getBoard(), klsudoku, users, userID, json)
+				//chatHandler(dataFromClient,messageHistory, currentBoard, klsudoku, users, userID, json, sudokuHandler, playersReady)
 				console.log(dataFromClient.msg)
-
-	if (dataFromClient.msg === '/start') {
-		console.log('/start detected')
-		startTime = setInterval(gameTimer, 1000)
-	}
-	if (dataFromClient.msg === '/stop') {
-		console.log('/stop detected')
-		console.log(startTime)
-		clearInterval(startTime)
-	}
-	if (
-		(dataFromClient.msg === '/newboard') |
-		(dataFromClient.msg === '/newboard easy')
-	) {
-		console.log('/newboard detected')
-		currentBoard = await getBoard('easy')
-		let json = {
-			type: 'info',
-			players: playersReady,
-			board: currentBoard
-		}
-		console.log(json)
-		sendMessage(JSON.stringify(json))
-	}
-	if (dataFromClient.msg === '/newboard medium') {
-		console.log('/newboard detected')
-		currentBoard = await getBoard('medium')
-		let json = {
-			type: 'info',
-			players: playersReady,
-			board: currentBoard
-		}
-		console.log(json)
-		sendMessage(JSON.stringify(json))
-	}
-	if (dataFromClient.msg === '/newboard hard') {
-		console.log('/newboard detected')
-		currentBoard = await getBoard('hard')
-		let json = {
-			type: 'info',
-			players: playersReady,
-			board: currentBoard
-		}
-		console.log(json)
-		sendMessage(JSON.stringify(json))
-	}
-	if (dataFromClient.msg === '/solve') {
-		console.log('/solve detected')
-		let solverMask = [].concat(...currentBoard)
-		console.log('mask', solverMask)
-		solverMask = solverMask.toString()
-		solverMask = solverMask.replace(/,/g, '')
-		console.log('stringmask', solverMask)
-		solution = klsudoku.solve(solverMask)
-		solution = solution.solution
-		let tiles = solution.match(/.{1,9}/g)
-		let board = tiles.map((tile) => tile.split('').map((t) => Number(t)))
-		console.log('sol var', solution)
-		let json = {
-			type: 'gamemove'
-		}
-		json.data = {
-			username: users[userID],
-			player: 1,
-			gamefield: board
-		}
-		console.log(json)
-		sendMessage(JSON.stringify(json))
-	}
-	if (dataFromClient.msg === '/attack') {
-		console.log('/attack detected')
-		handleAttacks(dataFromClient)
-	}
-
-	messageHistory = [
-		...messageHistory,
-		`${users[userID]}: ${dataFromClient.msg}`
-	]
-	json.data = {
-		username: users[userID],
-		'user-id': userID,
-		player: dataFromClient.player,
-		chat: messageHistory
-	} //add user +activity to the data of our response
+				if (dataFromClient.msg === '/start') {
+					console.log('/start detected')
+					startTime = setInterval(gameTimer, 1000)
 				}
+				if (dataFromClient.msg === '/stop') {
+					console.log('/stop detected')
+					console.log(startTime)
+					clearInterval(startTime)
+				}
+				if (
+					(dataFromClient.msg === '/newboard') |
+					(dataFromClient.msg === '/newboard easy')
+				) {
+					console.log('/newboard detected')
+					currentBoard = await getBoard('easy')
+					let json = {
+						type: 'info',
+						players: playersReady,
+						board: currentBoard
+					}
+					console.log(json)
+					sendMessage(JSON.stringify(json))
+				}
+				if (dataFromClient.msg === '/newboard medium') {
+					console.log('/newboard detected')
+					currentBoard = await getBoard('medium')
+					let json = {
+						type: 'info',
+						players: playersReady,
+						board: currentBoard
+					}
+					console.log(json)
+					sendMessage(JSON.stringify(json))
+				}
+				if (dataFromClient.msg === '/newboard hard') {
+					console.log('/newboard detected')
+					currentBoard = await getBoard('hard')
+					let json = {
+						type: 'info',
+						players: playersReady,
+						board: currentBoard
+					}
+					console.log(json)
+					sendMessage(JSON.stringify(json))
+				}
+				if (dataFromClient.msg === '/solve') {
+					console.log('/solve detected')
+					let solverMask = [].concat(...currentBoard)
+					console.log('mask', solverMask)
+					solverMask = solverMask.toString()
+					solverMask = solverMask.replace(/,/g, '')
+					console.log('stringmask', solverMask)
+					solution = klsudoku.solve(solverMask)
+					solution = solution.solution
+					let tiles = solution.match(/.{1,9}/g)
+					let board = tiles.map((tile) =>
+						tile.split('').map((t) => Number(t))
+					)
+					console.log('sol var', solution)
+					let json = {
+						type: 'gamemove'
+					}
+					json.data = {
+						username: users[userID],
+						player: 1,
+						gamefield: board
+					}
+					console.log(json)
+					sendMessage(JSON.stringify(json))
+				}
+				if (dataFromClient.msg === '/attack') {
+					console.log('/attack detected')
+					handleAttacks(dataFromClient)
+				}
+
+				messageHistory = [
+					...messageHistory,
+					`${users[userID]}: ${dataFromClient.msg}`
+				]
+				json.data = {
+					username: users[userID],
+					'user-id': userID,
+					player: dataFromClient.player,
+					chat: messageHistory
+				} //add user +activity to the data of our response
+			}
 			////////////////// HANDLE GAME_MOVES //////////////////
 			if (dataFromClient.type === reqTypes.GAME_MOVE) {
 				console.log(
