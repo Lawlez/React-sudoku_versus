@@ -1,30 +1,18 @@
+import {w3cwebsocket as W3CWebSocket} from 'websocket'
 import {makeStyles} from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import React, {useState} from 'react'
-import ReactDOM from 'react-dom'
-import './index.css'
 import RenderBoard from './board'
+import ReactDOM from 'react-dom'
 import MyButton from './button'
 import Timer from './timer'
 import Login from './login'
 import Chat from './chat'
-import {w3cwebsocket as W3CWebSocket} from 'websocket'
+import './index.css'
 
 const client = new W3CWebSocket('ws://192.168.100.211:8080')
-
-export const fields = [
-	[4, 8, null, null, null, 5, null, 9, 7],
-	[null, null, 7, 2, null, 9, 3, null, 6],
-	[9, 2, 6, 4, 7, 3, null, null, null],
-	[null, null, null, 9, 6, null, null, 8, null],
-	[1, null, 8, null, 3, 7, null, null, 4],
-	[7, null, 5, null, null, null, null, 6, null],
-	[3, null, 9, null, null, null, null, null, null],
-	[null, null, null, 3, null, null, 4, 7, null],
-	[6, 4, 1, null, 5, 2, null, null, null]
-]
 const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1
@@ -174,13 +162,11 @@ const Game = () => {
 			playerN = Number(2)
 		}
 		if ((playerN !== undefined) & (playerN !== '')) {
-			client.send(
-				JSON.stringify({
+			sendMessage({
 					username: tempName,
 					type: 'userevent',
 					player: playerN
 				})
-			)
 			console.log('before send', playerN)
 			setPlayerNumber(playerN)
 			return
@@ -188,52 +174,64 @@ const Game = () => {
 		console.log(playerNumber)
 		console.log('player not set')
 	}
+	const sendMessage = (json) =>{
+		client.send(JSON.stringify(json))
+	}
 	const handleUserInput = (input, position, player) => {
-		client.send(
-			JSON.stringify({
+		sendMessage({
 				username: userName,
 				player: Number(playerNumber),
 				type: 'gamemove',
 				input: input,
 				inputPos: position
 			})
-		)
+		
 	}
 	const handleChatMessage = (msg) => {
 		console.log(msg)
-		client.send(
-			JSON.stringify({
+		sendMessage({
 				username: userName,
 				player: Number(playerNumber),
 				type: 'chat',
 				msg: msg
 			})
-		)
 	}
 
 	///// Game Functions /////
 	const resetGame = () => {
-		client.send(
-			JSON.stringify({
+		sendMessage({
 				username: userName,
 				player: Number(playerNumber),
 				type: 'resetgame'
 			})
-		)
 	}
 	const endGame = () => {
 		console.log('TODO end game function')
+		if (Object.keys(fieldInput).length < 30) {console.log('fill the board first bro')
+			return}
+		sendMessage({
+				username: userName,
+				player: Number(playerNumber),
+				type: 'endgame'
+			})
 	}
 	const launchAttack = () => {
-		client.send(
-			JSON.stringify({
+		sendMessage({
 				username: userName,
 				player: Number(playerNumber),
 				type: 'attack'
 			})
-		)
 	}
 	////// end Game Functions /////
+	const deleteValue = (cell) => {
+		sendMessage({
+				username: userName,
+				player: Number(playerNumber),
+				type: 'gamemove',
+				input: '',
+				inputPos: cell
+			})
+	}
 
 	console.log('Is evryone READY TO  MF PLAY')
 	console.log(allPlayers === 2)
@@ -260,6 +258,7 @@ const Game = () => {
 							<Grid item xs={6} className="playField1">
 								<Paper className={classes.paper}>
 									<RenderBoard
+									deleteValue={(cell)=>deleteValue(cell)}
 									fields={board}
 										handleUserInput={(e, cellID) =>
 											handleUserInput(e, cellID)

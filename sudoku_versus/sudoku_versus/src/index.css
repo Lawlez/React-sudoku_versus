@@ -135,50 +135,53 @@ code {
 	font-size: 42px !important;
 	display: inline-flex;
 }
-@media (max-width: 720px){
-.opponent {
-	width: 28px;
-	height: 28px;
-	border: 1px solid;
-}
-.square {
-	width: 32px;
-	height: 25px;
-	font-size: 14px;
-	text-align: center;
-	font-weight: bolder;
-}
-.loginWrapper {
-	height: 100%;
-	min-height: 200px;
-	width: 100%;
-	background-color: #333;
-	padding-top: 5%;
-	padding-left: 5%;
-	padding-right: 5%;
-}
-.fieldContainer input{
-	border:1px;
-	border-radius: 0!important;
-	width: 20px!important;
-	height: 20px!important;
-}
-.MuiGrid-container{
-	display:block!important;
-	margin-bottom: 20px;
-}
-.poo {
-	color: rgba(0, 0, 0, 1);
-	font-size: 22px !important;
-	display: inline-flex;
-}
+
+@media (max-width: 720px) {
+	.opponent {
+		width: 28px;
+		height: 28px;
+		border: 1px solid;
+	}
+
+	.square {
+		width: 32px;
+		height: 25px;
+		font-size: 14px;
+		text-align: center;
+		font-weight: bolder;
+	}
+
+	.loginWrapper {
+		height: 100%;
+		min-height: 200px;
+		width: 100%;
+		background-color: #333;
+		padding-top: 5%;
+		padding-left: 5%;
+		padding-right: 5%;
+	}
+
+	.fieldContainer input {
+		border: 1px;
+		border-radius: 0 !important;
+		width: 20px !important;
+		height: 20px !important;
+	}
+
+	.MuiGrid-container {
+		display: block !important;
+		margin-bottom: 20px;
+	}
+
+	.poo {
+		color: rgba(0, 0, 0, 1);
+		font-size: 22px !important;
+		display: inline-flex;
+	}
 }
 
-//fuck apples IOS overrides
+/*fuck apples IOS overrides*/
 textarea,
-input.text,
-input[type="text"]
-.input-checkbox {
--webkit-appearance: none!important;
-border-radius: 0!important;
+input[type="text"] .input-checkbox {
+	-webkit-appearance: none !important
 }

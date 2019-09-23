@@ -1,17 +1,13 @@
 //login component
 import React from 'react'
-
 import MyButton from './button'
 const Login = (props) => {
-	//TODO select spectator mode or be a player
 	return (
 		<div className="loginWrapper">
 			<div className="loginInner">
 				<input
 					type="text"
-					//value={props.uName}
-					
-						placeholder="username"
+					placeholder="username"
 					onChange={(e) => props.handleUserInput(e.target.value)}
 				/>
 				<MyButton

@@ -44,6 +44,7 @@ export const NewSquare = (props) => {
 			field = (
 				<InputField
 					value={props.inputValue}
+					deleteValue={()=>props.deleteValue()}
 					onCorrectInput={(value) => props.handleUserInput(value)}
 				/>
 			)
