@@ -1,21 +1,21 @@
 //server-side Chat handler
 import {getBoard} from "./sudokuHandler"
-import {sendMessage} from "./server"
+import {sendMessage, playersReady, dataFromClient, users,} from "./server"
+import gameTimer, {startTimer, stopTimer, handleAttacks, } from './srvHelpers'
 let messageHistory = [
 		'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
 		'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys'
 	]
-export const ChatHandler = async (dataFromClient, currentBoard, klsudoku, users, userID, sudokuHandler, playersReady) => {
-let json = {}
+export const ChatHandler = async (klsudoku, userID, sudokuHandler, currentBoard) => {
+let json1 = {
+type: dataFromClient.type}
 	console.log(dataFromClient.msg)
 	if (dataFromClient.msg === '/start') {
 		console.log('/start detected')
-		startTime = setInterval(gameTimer, 1000)
-	}
-	if (dataFromClient.msg === '/stop') {
+		startTimer()
+	}else if (dataFromClient.msg === '/stop') {
 		console.log('/stop detected')
-		console.log(startTime)
-		clearInterval(startTime)
+		stopTimer()
 	}
 	if (
 		(dataFromClient.msg === '/newboard') |
@@ -23,35 +23,38 @@ let json = {}
 	) {
 		console.log('/newboard detected')
 		currentBoard = await getBoard('easy')
-		json = {
+		json1 = {
 			type: 'info',
 			players: playersReady,
 			board: currentBoard
 		}
-		console.log(json)
-		//sendMessage(JSON.stringify(json))
+		console.log(json1)
+		sendMessage(JSON.stringify(json1))
+		json1 = {type: 'chat'}
 	}
 	if (dataFromClient.msg === '/newboard medium') {
 		console.log('/newboard detected')
 		currentBoard = await getBoard('medium')
-		json = {
+		json1 = {
 			type: 'info',
 			players: playersReady,
 			board: currentBoard
 		}
-		console.log(json)
-		//sendMessage(JSON.stringify(json))
+		console.log(json1)
+		sendMessage(JSON.stringify(json1))
+		json1 = {type: 'chat'}
 	}
 	if (dataFromClient.msg === '/newboard hard') {
 		console.log('/newboard detected')
 		currentBoard = await getBoard('hard')
-		json = {
+		json1 = {
 			type: 'info',
 			players: playersReady,
 			board: currentBoard
 		}
-		console.log(json)
-		//sendMessage(JSON.stringify(json))
+		console.log(json1)
+		sendMessage(JSON.stringify(json1))
+		json1 = {type: 'chat'}
 	}
 	if (dataFromClient.msg === '/solve') {
 		console.log('/solve detected')
@@ -65,16 +68,17 @@ let json = {}
 		let tiles = solution.match(/.{1,9}/g)
 		let board = tiles.map((tile) => tile.split('').map((t) => Number(t)))
 		console.log('sol var', solution)
-		json = {
+		json1 = {
 			type: 'gamemove'
 		}
-		json.data = {
+		json1.data = {
 			username: users[userID],
 			player: 1,
 			gamefield: board
 		}
-		console.log(json)
-		//sendMessage(JSON.stringify(json))
+		console.log(json1)
+		sendMessage(JSON.stringify(json1))
+		json1 = {type: 'chat'}
 	}
 	if (dataFromClient.msg === '/attack') {
 		console.log('/attack detected')
@@ -85,15 +89,15 @@ let json = {}
 		...messageHistory,
 		`${users[userID]}: ${dataFromClient.msg}`
 	]
-	json.data = {
+	json1.data = {
 		username: users[userID],
 		'user-id': userID,
 		player: dataFromClient.player,
 		chat: messageHistory
 	} //add user +activity to the data of our response
-	console.log('jsonin sendhandkler',json)
-	//sendMessage(JSON.stringify(json))
-	return json
+	console.log('json1 in sendhandkler',json1)
+	//sendMessage(JSON.stringify(json1))
+	return json1
 }
 
 export default ChatHandler

@@ -1,35 +1,39 @@
 //server
 import http from 'http'
 import chatHandler from './chatHandler'
-export const clients = {} //keeps track of connected clients
+import gameTime, {getUniqueID, sendGameMove, handleAttacks} from './srvHelpers'
+
 const klsudoku = require('klsudoku')
-import sudokuHandler, {getBoard, sudokuMaster} from './sudokuHandler'
+import sudokuHandler, {
+	getBoard,
+	sudokuMaster,
+	currentBoard
+} from './sudokuHandler'
 
 ///////// SENDING GENERAL RESPONSES /////////////
-	export const sendMessage = (json) => {
-		// We are sending the current data to all connected clients
-		Object.keys(clients).map((client) => {
-			clients[client].sendUTF(json)
-		})
-	}
+export const sendMessage = (json) => {
+	// We are sending the current data to all connected clients
+	Object.keys(clients).map((client) => {
+		clients[client].sendUTF(json)
+	})
+}
+export const users = {} //obj keeps track of ALL USERS
+export let userActivity = []
+export let dataFromClient = null
+export const clients = {} //keeps track of connected clients
+export let gameField1 = {} //PLayer 1 values
+export let gameField2 = {} //Player 2 Values
+export let spectators = {} //obj keeps track of SPECTATORS
+export let players = {} //obj that keeps track of PLAYERS
 export let json = {}
+export let playersReady = 0 //count if both players are ready
 const WebSocketSrv = async () => {
 	const webSocketServerPort = 8080
 	const webSocketServer = require('websocket').server
-	const http = require('http')
 	// starting the http server and the websocket server.
 	const server = http.createServer()
 	server.listen(webSocketServerPort)
 	const wsServer = new webSocketServer({httpServer: server})
-	const users = {} //obj keeps track of ALL USERS
-	let spectators = {} //obj keeps track of SPECTATORS
-	let players = {} //obj that keeps track of PLAYERS
-	let userActivity = []
-	let currentBoard
-	let gameField1 = {} //PLayer 1 values
-	let gameField2 = {} //Player 2 Values
-	let initialBoard// = getinitialBoard()
-	let playersReady = 0 //count if both players are ready
 	const reqTypes = {
 		//defining user request types
 		USER_EVENT: 'userevent',
@@ -39,80 +43,7 @@ const WebSocketSrv = async () => {
 		CHAT: 'chat',
 		ENDGAME: 'endgame'
 	}
-	const attackTypes = {
-		//defining attack types
-		STROBO: 'stroboscope',
-		DELETE: 'delete random entry',
-		SHAKE: 'shakes the playfield',
-		SWITCH: 'switches playfield values',
-		MEME: 'display distracting memes & gifs'
-	}
-	////////TIMER FUNCTION///////////
-	let playTimer = 0
-	let startTime
-	const gameTimer = () => {
-		playTimer = playTimer + 1
-		playTimer.toFixed(3)
-		console.log(playTimer) ///wait 1 seconds until cleint is rdy to recieve
-		sendMessage(JSON.stringify({type: 'time', time: playTimer}))
-	}
-	if (playersReady === 2) {
-		startTime = setInterval(gameTimer, 1000)
-	}
-	if (playersReady <= 2) {
-		clearInterval(startTime)
-	}
-	/////////////////////////////////
-
-	//TODO SOLVER & GENERATOR
-
-	const handleAttacks = (dataFromClient) => {
-		const randomAttack = (obj) => {
-			let attackKey = Object.keys(obj)
-			return obj[attackKey[(attackKey.length * Math.random()) << 0]]
-		}
-
-		let currentAttack = randomAttack(attackTypes)
-		console.log(currentAttack)
-
-		userActivity.push(
-			`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
-		)
-		json = {type: 'attack'}
-		json.data = {
-			user: dataFromClient.username,
-			player: dataFromClient.player,
-			attack: currentAttack,
-			userActivity
-		}
-		console.log(json)
-		sendMessage(JSON.stringify(json))
-	}
-
-	// generates unique userid for everyuser.
-	const getUniqueID = () => {
-		const s4 = () =>
-			Math.floor((1 + Math.random()) * 0x10000)
-				.toString(16)
-				.substring(1)
-		return s4() + '-' + s4()
-	}
-	
-	//// SeNDING RESPONSE TO GAME MOVES ////////
-	const sendGameMove = (json) => {
-		Object.keys(players).map((player) => {
-			console.log('plapyersend', player)
-			players[player].sendUTF(JSON.stringify(json))
-		})
-		json.field = {
-			gamefield1: gameField1,
-			gamefield2: gameField2
-		}
-		Object.keys(spectators).map((spectator) => {
-			console.log('spectatorsend', spectator)
-			spectators[spectator].sendUTF(JSON.stringify(json))
-		})
-	}
+	let initialBoard = await getBoard('easy') //starting board
 
 	wsServer.on('request', async function(request) {
 		var userID = getUniqueID()
@@ -122,10 +53,9 @@ const WebSocketSrv = async () => {
 				request.origin +
 				'.'
 		)
-		if (!currentBoard) {
-			console.log("currentBoard", currentBoard);
-
-			initialBoard = await getBoard('easy')
+		console.log('current board ist jetzt jkg', currentBoard)
+		if (currentBoard.length > 5) {
+			initialBoard = currentBoard
 		}
 		let json = {
 			//send initial info on connect(how many PLAYERS connected)
@@ -140,11 +70,11 @@ const WebSocketSrv = async () => {
 		const connection = request.accept(null, request.origin)
 		clients[userID] = connection
 		console.log('connected: ' + userID + ' in ' + clients)
-////^^SETUP
+		////^^SETUP
 
 		connection.on('message', async function(message) {
 			console.log('new Request: ', message)
-			const dataFromClient = JSON.parse(message.utf8Data)
+			dataFromClient = JSON.parse(message.utf8Data)
 			json = {type: dataFromClient.type} //prepare answer with same type as request
 
 			//////////////////HANDLING LOGIN AND USER_EVENT //////////////////
@@ -213,10 +143,13 @@ const WebSocketSrv = async () => {
 			}
 			//////////////////HANDLING CHAT//////////////////
 			if (dataFromClient.type === reqTypes.CHAT) {
-				json = await chatHandler(dataFromClient,currentBoard, klsudoku, users, userID, sudokuHandler, playersReady)
-				
+				json = await chatHandler(
+					klsudoku,
+					userID,
+					sudokuHandler,
+					currentBoard
+				)
 			}
-				console.log('nach chat HANDLER',json)
 			////////////////// HANDLE GAME_MOVES //////////////////
 			if (dataFromClient.type === reqTypes.GAME_MOVE) {
 				console.log(

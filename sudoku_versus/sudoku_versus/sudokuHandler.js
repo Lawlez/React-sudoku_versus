@@ -1,15 +1,18 @@
 //sudokuHandler
 const fetch = require('node-fetch')
 const klsudoku = require('klsudoku')
-import {currentBoard} from './server'
+export let currentBoard =[]//board as soon as players regenerate (replaces initialBoard)
 	let puzzle
 	let solution
-	if (currentBoard) {
+	console.log(currentBoard)
+	if (currentBoard.lenght <5 ) {
 				let solverMask = [].concat(...currentBoard)
 				solution = klsudoku.solve(solverMask)
 			}
 export const sudokuMaster = (sudoku) => {
 		console.log('inside master')
+
+	console.log(currentBoard)
 		if (sudoku) {//COMPARING USER INPUt TO SOLUTION
 			console.log('sudoku true')
 			console.log(sudoku)
