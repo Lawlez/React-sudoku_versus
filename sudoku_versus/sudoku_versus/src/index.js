@@ -50,21 +50,19 @@ const Game = () => {
 	const [messageHistory, setMessageHistory] = useState([])
 	const [time, setTime] = useState(0)
 	const [board, setBoard] = useState([])
-	//let messageHistory = []
 	let dataFromServer
-	console.log('Players rdy: ', allPlayers)
-	////////// Websocket functions start///////////////////
+	////// Websocket functions start///////////////////
 	client.onopen = () => {
 		console.log('WebSocket Client Connected to server')
 	}
 	client.onclose = () => {
-		console.log('WebSocket server closing or offline...')
+		console.warn('WebSocket server closing or offline...')
 	}
 	client.onmessage = (message) => {
-		console.log(message)
+		// console.log(message)
 		dataFromServer = JSON.parse(message.data)
 		console.log('im RECIEVING parsed: ', dataFromServer)
-		console.log('im player ', playerNumber)
+		// console.log('im player ', playerNumber)
 
 		if (dataFromServer.type === 'info') {
 			if (dataFromServer.players) {
@@ -81,7 +79,6 @@ const Game = () => {
 		}
 		if (dataFromServer.type === 'userevent') {
 			/* ON USEREVENT*/
-
 			let index = dataFromServer.data.userActivity.length - 1
 			console.log(
 				'UserActivity index: ',
@@ -100,7 +97,7 @@ const Game = () => {
 			if (tempName === dataFromServer.data.username) {
 				setUserName(dataFromServer.data.username)
 				setIsLoggedIn(true)
-				console.log('should be loggedin')
+				// console.log('should be loggedin')
 			} else if (dataFromServer.data.username === 'UsrNameTaken') {
 				alert('username already exists! sorry :c ')
 				setIsLoggedIn(false)
@@ -118,36 +115,40 @@ const Game = () => {
 			]
 			setUserActivity(newestActivity)
 			setFieldInput(undefined)
-			console.log(fieldInput)
+			// console.log(fieldInput)
 		}
 
 		if (dataFromServer.type === 'chat') {
-			console.log(dataFromServer)
 			setMessageHistory([...dataFromServer.data.chat])
-			console.log('index history ', messageHistory)
+			// console.log('index history ', messageHistory)
 		}
 
 		if (dataFromServer.type === 'gamemove') {
+			console.log('in gamemove')
 			if (playerNumber === 'spectator') {
 				if (dataFromServer.field) {
-					console.log('spectator hey')
+					// console.log('spectator hey')
 					setFieldInput(dataFromServer.field.gamefield1)
 					setOpponentFields(dataFromServer.field.gamefield2)
 				}
 			} else {
+				console.log('my number',playerNumber,'message num',dataFromServer.data.player)
 				if (dataFromServer.data.player === playerNumber) {
 					console.log('I made a move')
 
 					setFieldInput(dataFromServer.data.gamefield)
-					console.log(fieldInput)
+					// console.log(fieldInput)
 				} else {
 					console.log('OPPONENT made a move')
 					setOpponentFields(dataFromServer.data.gamefield)
-					console.log(opponentFields)
+					// console.log(opponentFields)
 				}
 			}
 		}
-
+		if (dataFromServer.type === 'endgame') {
+			setMessageHistory([dataFromServer.data.userActivity[dataFromServer.data.userActivity.length - 1]])
+			return
+		}
 		if (dataFromServer.type === 'attack') {
 			let index = dataFromServer.data.userActivity.length - 1
 			let newestActivity = [
@@ -158,10 +159,7 @@ const Game = () => {
 			//TODO handle server response for attacks
 		}
 	}
-	////////// Websocket functions end///////////////////
-
-	console.log('Is evryone READY TO  MF PLAY')
-	console.log(allPlayers === 2)
+	////// Websocket functions end///////////////////
 	return (
 		<div className="game">
 			<Container>
@@ -285,5 +283,4 @@ const Game = () => {
 		</div>
 	)
 }
-
 ReactDOM.render(<Game />, document.getElementById('root'))

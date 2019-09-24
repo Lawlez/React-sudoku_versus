@@ -19,10 +19,6 @@ const useStyles = makeStyles((theme) => ({
 
 export const MyButton = (props) => {
 	const classes = useStyles()
-	let classNames = 'button'
-	if (props.extraclass) {
-		classNames = `button ${props.extraclass}`
-	}
 	return (
 		<Button
 			className={classes.button}

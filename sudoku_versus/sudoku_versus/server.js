@@ -211,17 +211,17 @@ const WebSocketSrv = async () => {
 			if (dataFromClient.type === reqTypes.ENDGAME) {
 				let player1Win = sudokuMaster(gameField1)
 				let player2Win = sudokuMaster(gameField2)
-				if (player2Win) {
+				if (player2Win === true) {
 					userActivity.push(
 						`Player 2 has WON the game! Congratulations!`
 					)
-				} else if (player1Win) {
+				} else if (player1Win === true) {
 					userActivity.push(
 						`Player 1 has WON the game! Congratulations!`
 					)
 				} else {
 					userActivity.push(
-						`Nobody filled the board correctly.. try again!`
+						`Nobody filled the board correctly.. Player1:${player1Win} PLayer2:${player2Win}`
 					)
 				}
 				json.data = {

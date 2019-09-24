@@ -11,8 +11,6 @@ import React, {useState, useEffect} from 'react'
 import List from '@material-ui/core/List'
 import Card from '@material-ui/core/Card'
 
-
-
 const useStyles = makeStyles((theme) => ({
 	textField: {
 		marginLeft: theme.spacing(1),
@@ -46,14 +44,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Chat = (props) => {
-	const [userMessage, setUserMessage] = useState()
-	const [messageHistory, setMessageHistory] = useState(props.history)
+	const [userMessage, setUserMessage] = useState('')
 	const classes = useStyles()
-	//console.log('message history:', messageHistory)
 
 	useEffect(() => {
 		autoScroll('chat')
-		setMessageHistory(props.history)
 	}, [props])
 
 	const autoScroll = (id) => {
@@ -66,7 +61,7 @@ export const Chat = (props) => {
 	}
 	const handleChatMessage = (e) => {
 		if (!userMessage) {
-			return console.log('message cannot be emtpy')
+			return console.warn('message cannot be emtpy')
 		}
 		props.onMessage(userMessage)
 		setUserMessage('')
@@ -76,7 +71,6 @@ export const Chat = (props) => {
 			handleChatMessage()
 		}
 	}
-	//console.log(props.history)
 	return (
 		<Container maxWidth="md">
 			<Card>

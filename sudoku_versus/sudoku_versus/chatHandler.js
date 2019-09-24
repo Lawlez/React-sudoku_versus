@@ -63,7 +63,7 @@ type: dataFromClient.type}
 		solverMask = solverMask.toString()
 		solverMask = solverMask.replace(/,/g, '')
 		console.log('stringmask', solverMask)
-		solution = klsudoku.solve(solverMask)
+		let solution = klsudoku.solve(solverMask)
 		solution = solution.solution
 		let tiles = solution.match(/.{1,9}/g)
 		let board = tiles.map((tile) => tile.split('').map((t) => Number(t)))
@@ -95,7 +95,6 @@ type: dataFromClient.type}
 		player: dataFromClient.player,
 		chat: messageHistory
 	} //add user +activity to the data of our response
-	console.log('json1 in sendhandkler',json1)
 	//sendMessage(JSON.stringify(json1))
 	return json1
 }

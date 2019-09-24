@@ -36,18 +36,31 @@ import {playersReady, sendMessage, spectators, players, gameField1, gameField2, 
 	
 	//// SeNDING RESPONSE TO GAME MOVES ////////
 	export const sendGameMove = (json) => {
-		Object.keys(players).map((player) => {
-			console.log('plapyersend', player)
+		let i = 0
+		console.log('im sending', json)
+		for (let player in players) {
 			players[player].sendUTF(JSON.stringify(json))
-		})
+			i++; console.log(i,'times')
+		}
+		/*
+		Object.keys(players).map((player) => {
+			//console.log('playersend', player)
+			players[player].sendUTF(JSON.stringify(json))
+		})*/
 		json.field = {
 			gamefield1: gameField1,
 			gamefield2: gameField2
 		}
+
+		for (let spec in spectators){
+			spectators[spec].sendUTF(JSON.stringify(json))
+			i++; console.log(i,'times')
+		}
+		/*
 		Object.keys(spectators).map((spectator) => {
-			console.log('spectatorsend', spectator)
+			console.log('spectatorsend', spectators[spectator])
 			spectators[spectator].sendUTF(JSON.stringify(json))
-		})
+		})*/
 	}
 //////////////////// attacks /////////////////////
 const attackTypes = {
