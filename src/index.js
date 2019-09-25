@@ -132,12 +132,17 @@ const Game = () => {
 					setOpponentFields(dataFromServer.field.gamefield2)
 				}
 			} else {
-				console.log('my number',playerNumber,'message num',dataFromServer.data.player)
+				console.log(
+					'my number',
+					playerNumber,
+					'message num',
+					dataFromServer.data.player
+				)
 				if (dataFromServer.data.player === playerNumber) {
 					console.log('I made a move')
 
 					setFieldInput(dataFromServer.data.gamefield)
-					 console.log(fieldInput)
+					console.log(fieldInput)
 				} else {
 					console.log('OPPONENT made a move')
 					setOpponentFields(dataFromServer.data.gamefield)
@@ -146,7 +151,11 @@ const Game = () => {
 			}
 		}
 		if (dataFromServer.type === 'endgame') {
-			setMessageHistory([dataFromServer.data.userActivity[dataFromServer.data.userActivity.length - 1]])
+			setMessageHistory([
+				dataFromServer.data.userActivity[
+					dataFromServer.data.userActivity.length - 1
+				]
+			])
 			return
 		}
 		if (dataFromServer.type === 'attack') {

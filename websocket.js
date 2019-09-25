@@ -2,13 +2,26 @@
 import http from 'http'
 import chatHandler from './chatHandler'
 import {sendMessage, klsudoku} from './server'
-import gameTime, {getUniqueID, sendGameMove, handleAttacks, attackTypes, userRegisterHandler} from './srvHelpers'
-import sudokuHandler, {
-	getBoard,
-	endGame,
-	currentBoard
-} from './sudokuHandler'
-export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gameField1,gameField2,spectators,players,json,playersReady) => {
+import gameTime, {
+	getUniqueID,
+	sendGameMove,
+	handleAttacks,
+	attackTypes,
+	userRegisterHandler
+} from './srvHelpers'
+import sudokuHandler, {getBoard, endGame, currentBoard} from './sudokuHandler'
+export const WebSocketSrv = async (
+	users,
+	userActivity,
+	dataFromClient,
+	clients,
+	gameField1,
+	gameField2,
+	spectators,
+	players,
+	json,
+	playersReady
+) => {
 	const webSocketServerPort = 8080
 	const webSocketServer = require('websocket').server
 	// starting the http server and the websocket server.
@@ -57,8 +70,16 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 			json = {type: dataFromClient.type} //prepare answer with same type as request
 
 			//////////////////HANDLING LOGIN AND USER_EVENT //////////////////
-			if (dataFromClient.type === reqTypes.USER_EVENT) { //>>>works
-				let output = userRegisterHandler(dataFromClient, users, userID, playersReady, spectators, players)
+			if (dataFromClient.type === reqTypes.USER_EVENT) {
+				//>>>works
+				let output = userRegisterHandler(
+					dataFromClient,
+					users,
+					userID,
+					playersReady,
+					spectators,
+					players
+				)
 				json.data = output.json
 				players = output.players
 				spectators = output.spectators
@@ -66,7 +87,8 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 				console.log(spectators)
 			}
 			//////////////////HANDLING RESET /////////////////////////////////
-			if (dataFromClient.type === reqTypes.RESET) { //>>>works
+			if (dataFromClient.type === reqTypes.RESET) {
+				//>>>works
 				userActivity.push(
 					`${dataFromClient.username} RESET the Game as Player ${dataFromClient.player} with UID ${userID}`
 				)
@@ -83,7 +105,8 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 				}
 			}
 			//////////////////HANDLING CHAT////////////////////////////////////
-			if (dataFromClient.type === reqTypes.CHAT) { //>>>works
+			if (dataFromClient.type === reqTypes.CHAT) {
+				//>>>works
 				json = await chatHandler(
 					klsudoku,
 					userID,
@@ -131,7 +154,8 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 				}
 			}
 			///////////////HANDLE ATTACKS ///////////////////////////////////
-			if (dataFromClient.type === reqTypes.ATTACK) { //>>>works
+			if (dataFromClient.type === reqTypes.ATTACK) {
+				//>>>works
 				const randomAttack = (obj) => {
 					let attackKey = Object.keys(obj)
 					return obj[
@@ -150,8 +174,14 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 					userActivity
 				}
 			}
-			if (dataFromClient.type === reqTypes.ENDGAME) { //>>>works
-				json.data = endGame(userActivity, gameField1, gameField2, dataFromClient)
+			if (dataFromClient.type === reqTypes.ENDGAME) {
+				//>>>works
+				json.data = endGame(
+					userActivity,
+					gameField1,
+					gameField2,
+					dataFromClient
+				)
 			}
 			////////////SENDING RESPONSES /////////////////////////////////
 			console.log('Message I sent to client: ', json)
@@ -171,7 +201,7 @@ export const WebSocketSrv = async (users,userActivity,dataFromClient,clients,gam
 			if (playersReady > 0) {
 				playersReady--
 			}
-			//todo clean player and spectator arrays 
+			//todo clean player and spectator arrays
 			delete clients[userID]
 			delete users[userID]
 			sendMessage(JSON.stringify(json))

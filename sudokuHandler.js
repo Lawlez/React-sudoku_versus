@@ -79,7 +79,12 @@ export const getBoard = (difficulty = 'easy') => {
 		.catch((e) => sudokuMaster()) //fall back to local generator in case API goes OFFLINE
 }
 
-export const endGame = (userActivity, gameField1, gameField2, dataFromClient) => {
+export const endGame = (
+	userActivity,
+	gameField1,
+	gameField2,
+	dataFromClient
+) => {
 	let json = {}
 	let player1Win = sudokuMaster(gameField1)
 	let player2Win = sudokuMaster(gameField2)
