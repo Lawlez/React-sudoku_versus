@@ -1,4 +1,4 @@
-//handlers
+//handlers //>>>works
 import {client} from './index'
 export const handleUserNameInput = (e, setTempName, tempName) => {
 	setTempName(e) //////needs function
@@ -54,16 +54,19 @@ export const resetGame = (userName, playerNumber) => {
 }
 
 export const endGame = (userName, playerNumber, fieldInput) => {
-	console.log('TODO end game function')
-	if (Object.keys(fieldInput).length < 5) {
-		console.log('fill the board first bro')
+	console.log('TODO end game function', fieldInput)
+	if (!fieldInput) {
+		console.warn('fill the board first bro')
+		return
+	}else if (Object.keys(fieldInput).length < 5) {
+		console.warn('fill at least some values')
 		return
 	}
 	sendMessage(userName, Number(playerNumber),'endgame')
 }
 ///////// ATTACK function////////
 export const launchAttack = (userName, playerNumber) => {
-	sendMessage(userName,Number(playerNumber),'attack')
+	sendMessage(userName,playerNumber,'attack')
 }
 export const deleteValue = (cell, userName, playerNumber) => {
 	sendMessage(userName,playerNumber,'gamemove','','',cell)

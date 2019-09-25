@@ -1,16 +1,16 @@
 //server-side Chat handler
 import {getBoard} from "./sudokuHandler"
-import {sendMessage, playersReady, dataFromClient, users,} from "./server"
+import {sendMessage, playersReady, users,} from "./server"
 import gameTimer, {startTimer, stopTimer, handleAttacks, } from './srvHelpers'
 let messageHistory = [
 		'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
 		'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys'
 	]
-export const ChatHandler = async (klsudoku, userID, sudokuHandler, currentBoard) => {
+export const ChatHandler = async (klsudoku, userID, sudokuHandler, currentBoard, dataFromClient) => {
 let json1 = {
 type: dataFromClient.type}
 	console.log(dataFromClient.msg)
-	if (dataFromClient.msg === '/start') {
+	if (dataFromClient.msg === '/start') {//>>>works
 		console.log('/start detected')
 		startTimer()
 	}else if (dataFromClient.msg === '/stop') {
@@ -19,7 +19,7 @@ type: dataFromClient.type}
 	}
 	if (
 		(dataFromClient.msg === '/newboard') |
-		(dataFromClient.msg === '/newboard easy')
+		(dataFromClient.msg === '/newboard easy') //>>>works
 	) {
 		console.log('/newboard detected')
 		currentBoard = await getBoard('easy')
@@ -32,7 +32,7 @@ type: dataFromClient.type}
 		sendMessage(JSON.stringify(json1))
 		json1 = {type: 'chat'}
 	}
-	if (dataFromClient.msg === '/newboard medium') {
+	if (dataFromClient.msg === '/newboard medium') { //>>>works
 		console.log('/newboard detected')
 		currentBoard = await getBoard('medium')
 		json1 = {
@@ -44,7 +44,7 @@ type: dataFromClient.type}
 		sendMessage(JSON.stringify(json1))
 		json1 = {type: 'chat'}
 	}
-	if (dataFromClient.msg === '/newboard hard') {
+	if (dataFromClient.msg === '/newboard hard') { //>>>works
 		console.log('/newboard detected')
 		currentBoard = await getBoard('hard')
 		json1 = {
@@ -56,7 +56,7 @@ type: dataFromClient.type}
 		sendMessage(JSON.stringify(json1))
 		json1 = {type: 'chat'}
 	}
-	if (dataFromClient.msg === '/solve') {
+	if (dataFromClient.msg === '/solve') { //>>>works
 		console.log('/solve detected')
 		let solverMask = [].concat(...currentBoard)
 		console.log('mask', solverMask)
@@ -80,7 +80,7 @@ type: dataFromClient.type}
 		sendMessage(JSON.stringify(json1))
 		json1 = {type: 'chat'}
 	}
-	if (dataFromClient.msg === '/attack') {
+	if (dataFromClient.msg === '/attack') { //>>>works
 		console.log('/attack detected')
 		handleAttacks(dataFromClient)
 	}

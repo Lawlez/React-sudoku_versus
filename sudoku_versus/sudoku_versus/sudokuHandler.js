@@ -10,6 +10,7 @@ if (currentBoard.lenght < 5) {
 	solution = klsudoku.solve(solverMask)
 }
 export const sudokuMaster = (sudoku) => {
+	//>>>works
 	console.log('inside master')
 
 	console.log(currentBoard)
@@ -29,6 +30,7 @@ export const sudokuMaster = (sudoku) => {
 		}
 		let corrVals = 0
 		for (let keyid in sudoku) {
+			//>>>works
 			let key = keyid.replace('cell', '')
 			let rowid = key[0]
 			let cellid = key[1]
@@ -38,20 +40,21 @@ export const sudokuMaster = (sudoku) => {
 			console.log(
 				`${userInputValue} verglichen mit  ${solution.charAt(position)}`
 			)
-			console.log(Number(userInputValue) === Number(solution.charAt(position)))
+			console.log(
+				Number(userInputValue) === Number(solution.charAt(position))
+			)
 			if (Number(userInputValue) !== Number(solution.charAt(position))) {
 				console.warn('values wrong')
 				return false
 			}
 			corrVals++
 		}
-		if (corrVals < 30) {
+		if (corrVals < 40) {
 			return 'all entered values correct. finish it!'
 		}
-
 	} else {
 		//GENERATING LOCAL SUDOKU
-		let result = klsudoku.generate()
+		let result = klsudoku.generate() //>>>works
 		console.log(result)
 		puzzle = result.puzzle
 		solution = result.solution
@@ -66,6 +69,7 @@ export const sudokuMaster = (sudoku) => {
 }
 //GET NEW BOARD FROM ONLINE API
 export const getBoard = (difficulty = 'easy') => {
+	//>>>works
 	return fetch(`https://sugoku.herokuapp.com/board?difficulty=${difficulty}`)
 		.then((response) => response.json())
 		.then((json) => {
@@ -73,4 +77,26 @@ export const getBoard = (difficulty = 'easy') => {
 			return json.board
 		})
 		.catch((e) => sudokuMaster()) //fall back to local generator in case API goes OFFLINE
+}
+
+export const endGame = (userActivity, gameField1, gameField2, dataFromClient) => {
+	let json = {}
+	let player1Win = sudokuMaster(gameField1)
+	let player2Win = sudokuMaster(gameField2)
+	if (player2Win === true) {
+		userActivity.push(`Player 2 has WON the game! Congratulations!`)
+	} else if (player1Win === true) {
+		userActivity.push(`Player 1 has WON the game! Congratulations!`)
+	} else {
+		userActivity.push(
+			`Nobody filled the board correctly.. Player1:${player1Win} PLayer2:${player2Win}`
+		)
+	}
+	json.data = {
+		player: dataFromClient.player,
+		player1: player1Win,
+		player2: player2Win,
+		userActivity
+	}
+	return json.data
 }

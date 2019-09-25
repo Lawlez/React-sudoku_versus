@@ -41,7 +41,7 @@ const Game = () => {
 	const [isLoggedIn, setIsLoggedIn] = useState(false) //toggle logiin
 	const [userName, setUserName] = useState()
 	const [userActivity, setUserActivity] = useState([])
-	const [fieldInput, setFieldInput] = useState({})
+	const [fieldInput, setFieldInput] = useState('')
 	const [opponentFields, setOpponentFields] = useState({})
 	const [playerNumber, setPlayerNumber] = useState('')
 	const [tempName, setTempName] = useState('')
@@ -137,7 +137,7 @@ const Game = () => {
 					console.log('I made a move')
 
 					setFieldInput(dataFromServer.data.gamefield)
-					// console.log(fieldInput)
+					 console.log(fieldInput)
 				} else {
 					console.log('OPPONENT made a move')
 					setOpponentFields(dataFromServer.data.gamefield)
