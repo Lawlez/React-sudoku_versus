@@ -78,8 +78,7 @@ export const Chat = (props) => {
 					<Typography className={classes.title}>
 						spectator Chat
 					</Typography>
-					<List className={classes.root} id="chat"
-					>
+					<List className={classes.root} id="chat">
 						{props.history.map((item) => (
 							<ListItem
 								key={`item${hstryLength() *

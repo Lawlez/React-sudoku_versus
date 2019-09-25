@@ -1,4 +1,3 @@
-
 import {
 	playersReady,
 	sendMessage,
@@ -49,7 +48,7 @@ export const getUniqueID = () => {
 //// SeNDING RESPONSE TO GAME MOVES ////////
 export const sendGameMove = (json, players, spectators) => {
 	let i = 0
-	console.log(players,spectators)
+	console.log(players, spectators)
 	console.log('im sending', json)
 	for (let player in players) {
 		players[player].sendUTF(JSON.stringify(json))
@@ -71,13 +70,13 @@ export const sendGameMove = (json, players, spectators) => {
 		i++
 		console.log(i, 'times')
 	}*/
-	
-		Object.keys(spectators).map((spectator) => {
-			console.log('spectatorsend', spectators[spectator])
-			i++
+
+	Object.keys(spectators).map((spectator) => {
+		console.log('spectatorsend', spectators[spectator])
+		i++
 		console.log(i, 'times')
-			spectators[spectator].sendUTF(JSON.stringify(json))
-		})
+		spectators[spectator].sendUTF(JSON.stringify(json))
+	})
 }
 //////////////////// attacks /////////////////////
 export const attackTypes = {
@@ -123,7 +122,8 @@ export const userRegisterHandler = (
 	playersReady,
 	spectators,
 	players
-) => {//[[[[[[[[>>>works]]]]]]]]
+) => {
+	//[[[[[[[[>>>works]]]]]]]]
 	let json1 = json
 	for (let keys in users) {
 		if (users[keys] === dataFromClient.username) {
@@ -141,13 +141,13 @@ export const userRegisterHandler = (
 		`${dataFromClient.username} joined the Game as Player ${dataFromClient.player} with UID ${userID}`
 	)
 	if (dataFromClient.player === 1 || dataFromClient.player === 2) {
-		if (dataFromClient.player === 1){
-		players = {...players, player1:clients[userID]}
-		}else if(dataFromClient.player === 2) {
-			players = {...players, player2:clients[userID]}
+		if (dataFromClient.player === 1) {
+			players = {...players, player1: clients[userID]}
+		} else if (dataFromClient.player === 2) {
+			players = {...players, player2: clients[userID]}
 		}
 		playersReady++
-		console.log("playersReady", playersReady)
+		console.log('playersReady', playersReady)
 	}
 	let spec = clients[userID]
 	if (dataFromClient.player === 'spectator') {

@@ -5,6 +5,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+##Preparation:
+run yarn install to get dependencies
+make sure you have a .babelrc file containing following command in your root 
+{   
+  "presets": [
+    "@babel/preset-env"   
+  ] 
+}
+
 In the project directory, you can run:
 
 ### `yarn start`
