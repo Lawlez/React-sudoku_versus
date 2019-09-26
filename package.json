@@ -15,7 +15,7 @@
     "websocket": "^1.0.30"
   },
   "scripts": {
-    "server": "nodemon --exec babel-node server.js",
+    "server": "nodemon --exec babel-node server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
