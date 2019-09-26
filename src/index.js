@@ -1,16 +1,9 @@
-import {w3cwebsocket as W3CWebSocket} from 'websocket'
-import {makeStyles} from '@material-ui/core/styles'
-import Container from '@material-ui/core/Container'
-import Paper from '@material-ui/core/Paper'
-import Grid from '@material-ui/core/Grid'
 import React, {useState} from 'react'
-import RenderBoard from './board'
 import ReactDOM from 'react-dom'
-import MyButton from './button'
-import Timer from './timer'
-import Login from './login'
-import Chat from './chat'
-import './index.css'
+import {w3cwebsocket as W3CWebSocket} from 'websocket'
+import {makeStyles,Container,Paper,Grid} from '@material-ui/core'
+import {Timer,MyButton,Login,Chat,RenderBoard} from './components'
+import './static/index.css'
 import {
 	handleUserNameInput,
 	onSubmit,
@@ -19,7 +12,8 @@ import {
 	resetGame,
 	endGame,
 	launchAttack,
-	deleteValue
+	deleteValue,
+	sendMessage
 } from './handlers'
 
 export const client = new W3CWebSocket('ws://192.168.100.211:8080')
@@ -53,6 +47,7 @@ const Game = () => {
 	let dataFromServer
 	////// Websocket functions start///////////////////
 	client.onopen = () => {
+		sendMessage(null,null,'ready')//tell srv we're ready
 		console.log('WebSocket Client Connected to server')
 	}
 	client.onclose = () => {
@@ -61,7 +56,7 @@ const Game = () => {
 	client.onmessage = (message) => {
 		// console.log(message)
 		dataFromServer = JSON.parse(message.data)
-		console.log('im RECIEVING parsed: ', dataFromServer)
+		console.log('im RECIEVING parsed:',dataFromServer)
 		// console.log('im player ', playerNumber)
 
 		if (dataFromServer.type === 'info') {
@@ -81,19 +76,13 @@ const Game = () => {
 			/* ON USEREVENT*/
 			let index = dataFromServer.data.userActivity.length - 1
 			console.log(
-				'UserActivity index: ',
-				dataFromServer.data.userActivity[index]
-			)
+				`UserActivity index: ${dataFromServer.data.userActivity[index]}`)
 			let newestActivity = [
 				...userActivity,
 				dataFromServer.data.userActivity[index]
 			]
 			setUserActivity(newestActivity)
-			console.log(
-				tempName,
-				'local ... server',
-				dataFromServer.data.username
-			)
+			console.log(`${tempName}local ... server'${dataFromServer.data.username}`)
 			if (tempName === dataFromServer.data.username) {
 				setUserName(dataFromServer.data.username)
 				setIsLoggedIn(true)
@@ -132,12 +121,7 @@ const Game = () => {
 					setOpponentFields(dataFromServer.field.gamefield2)
 				}
 			} else {
-				console.log(
-					'my number',
-					playerNumber,
-					'message num',
-					dataFromServer.data.player
-				)
+				console.log(`my number ${playerNumber} message num ${dataFromServer.data.player}`)
 				if (dataFromServer.data.player === playerNumber) {
 					console.log('I made a move')
 

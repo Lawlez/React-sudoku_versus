@@ -4,6 +4,7 @@ const klsudoku = require('klsudoku')
 ///////// SENDING GENERAL RESPONSES /////////////
 export const sendMessage = (json) => {
 	// We are sending the current data to all connected clients
+	console.log('sendmessage sends: ',json)
 	Object.keys(clients).map((client) => {
 		clients[client].sendUTF(json)
 	})

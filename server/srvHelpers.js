@@ -10,6 +10,7 @@ import {
 	json,
 	clients
 } from './server'
+import {defaultChatMsg} from '../config'
 ////////TIMER FUNCTION///////////
 let playTimer = 0
 let startTime = null
@@ -53,7 +54,7 @@ export const sendGameMove = (json, players, spectators) => {
 	for (let player in players) {
 		players[player].sendUTF(JSON.stringify(json))
 		i++
-		console.log(i, 'times')
+		console.log(`${i} times`)
 	}
 	/*
 		Object.keys(players).map((player) => {
@@ -72,9 +73,9 @@ export const sendGameMove = (json, players, spectators) => {
 	}*/
 
 	Object.keys(spectators).map((spectator) => {
-		console.log('spectatorsend', spectators[spectator])
+		console.log(`spectatorsend ${spectators[spectator]}`)
 		i++
-		console.log(i, 'times')
+		console.log(`${i} times`)
 		spectators[spectator].sendUTF(JSON.stringify(json))
 	})
 }
@@ -147,13 +148,13 @@ export const userRegisterHandler = (
 			players = {...players, player2: clients[userID]}
 		}
 		playersReady++
-		console.log('playersReady', playersReady)
+		console.log(`playersReady ${playersReady}`)
 	}
 	let spec = clients[userID]
 	if (dataFromClient.player === 'spectator') {
 		spectators[userID] = spec
 	}
-	console.log('spectators: ', spectators)
+	console.log('spectators: ',spectators)
 	json1.data = {
 		username: users[userID],
 		userid: userID,
@@ -162,11 +163,10 @@ export const userRegisterHandler = (
 		userActivity
 	} //add user +activity to the data of our response
 	let msg = {type: 'chat'}
+	console.warn('hehr')
+	console.log(defaultChatMsg)
 	msg.data = {
-		chat: [
-			'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
-			'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. '
-		]
+		chat: defaultChatMsg
 	}
 	console.log(msg)
 	sendMessage(JSON.stringify(msg)) //sending game instructions directly to chat
