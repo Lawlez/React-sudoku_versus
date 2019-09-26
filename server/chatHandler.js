@@ -18,41 +18,10 @@ const chatCommands = {
 		sendChatMessage(params)
 	},
 	newboard: async (params) => {
-		console.log('newboard detected')
-		let currentBoard = await getBoard('easy')
-		let json = {
-			type: 'info',
-			players: params.players,
-			board: currentBoard
-		}
-		sendMessage(JSON.stringify(json))
-		sendChatMessage(params)
-	},
-	'newboard medium': async (params) => {
-		console.log('newboard medium detected')
-		let currentBoard = await getBoard('medium')
-		let json = {
-			type: 'info',
-			players: params.players,
-			board: currentBoard
-		}
-		sendMessage(JSON.stringify(json))
-		sendChatMessage(params)
-	},
-	'newboard hard': async (params) => {
-		console.log('newboard hard detected')
-		let currentBoard = await getBoard('hard')
-		let json = {
-			type: 'info',
-			players: params.players,
-			board: currentBoard
-		}
-		sendMessage(JSON.stringify(json))
-		sendChatMessage(params)
-	},
-	'newboard easy': async (params) => {
-		console.log('newboard easy detected')
-		let currentBoard = await getBoard('easy')
+		console.log(`${params.dataFromClient.msg} detected`)
+		let diff = params.dataFromClient.msg.replace(/(\w+)(\W)\b/g,'').replace(/[/]/,'') //regex find last word in str
+		console.log('diff is:',diff) 
+		let currentBoard = await getBoard((diff !== 'easy' & diff !== 'medium' & diff !== 'hard') ? 'easy' : diff)
 		let json = {
 			type: 'info',
 			players: params.players,
@@ -63,7 +32,7 @@ const chatCommands = {
 	},
 	solve: (params) => {
 		console.log('/solve detected')
-		board = getSolution(true)
+		let board = getSolution(true)
 		let json = {
 			type: 'gamemove'
 		}
@@ -107,8 +76,10 @@ export const newChatHandler = async (
 		dataFromClient: dataFromClient
 	}
 	let detectedCommand = Object.keys(chatCommands).find(
-		commandName => dataFromClient.msg === `/${commandName}`
+		commandName => dataFromClient.msg.replace(/ .*/,'') === `/${commandName}`
+		
 	)
+	console.log("dataFromClient.msg.replace(/ .*/,'')", dataFromClient.msg.replace(/ .*/,''));
 	if (detectedCommand) {
 		chatCommands[detectedCommand](params)
 	} else {
