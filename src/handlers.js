@@ -33,7 +33,7 @@ export const sendMessage = (
 	input,
 	position
 ) => {
-	console.log('i sent player', playerNumber)
+	console.log(`i sent player ${playerNumber}`)
 	let json = {
 		username: userName,
 		player: playerNumber,
@@ -61,7 +61,7 @@ export const resetGame = (userName, playerNumber) => {
 }
 
 export const endGame = (userName, playerNumber, fieldInput) => {
-	console.log('TODO end game function', fieldInput)
+	console.log(`TODO end game function ${fieldInput}`)
 	if (!fieldInput) {
 		console.warn('fill the board first bro')
 		return

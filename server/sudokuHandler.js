@@ -26,7 +26,7 @@ export const sudokuMaster = (sudoku) => {
 			console.log(solverMask)
 			solution = klsudoku.solve(solverMask)
 			solution = solution.solution
-			console.log(solution, 'lösig')
+			console.log(`${solution}lösig`)
 		}
 		let corrVals = 0
 		for (let keyid in sudoku) {
