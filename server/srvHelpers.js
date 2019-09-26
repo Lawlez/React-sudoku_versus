@@ -1,4 +1,3 @@
-
 import {
 	playersReady,
 	sendMessage,
@@ -11,6 +10,7 @@ import {
 	json,
 	clients
 } from './server'
+import {defaultChatMsg} from '../config'
 ////////TIMER FUNCTION///////////
 let playTimer = 0
 let startTime = null
@@ -49,12 +49,12 @@ export const getUniqueID = () => {
 //// SeNDING RESPONSE TO GAME MOVES ////////
 export const sendGameMove = (json, players, spectators) => {
 	let i = 0
-	console.log(players,spectators)
+	console.log(players, spectators)
 	console.log('im sending', json)
 	for (let player in players) {
 		players[player].sendUTF(JSON.stringify(json))
 		i++
-		console.log(i, 'times')
+		console.log(`${i} times`)
 	}
 	/*
 		Object.keys(players).map((player) => {
@@ -71,13 +71,13 @@ export const sendGameMove = (json, players, spectators) => {
 		i++
 		console.log(i, 'times')
 	}*/
-	
-		Object.keys(spectators).map((spectator) => {
-			console.log('spectatorsend', spectators[spectator])
-			i++
-		console.log(i, 'times')
-			spectators[spectator].sendUTF(JSON.stringify(json))
-		})
+
+	Object.keys(spectators).map((spectator) => {
+		console.log(`spectatorsend ${spectators[spectator]}`)
+		i++
+		console.log(`${i} times`)
+		spectators[spectator].sendUTF(JSON.stringify(json))
+	})
 }
 //////////////////// attacks /////////////////////
 export const attackTypes = {
@@ -123,7 +123,8 @@ export const userRegisterHandler = (
 	playersReady,
 	spectators,
 	players
-) => {//[[[[[[[[>>>works]]]]]]]]
+) => {
+	//[[[[[[[[>>>works]]]]]]]]
 	let json1 = json
 	for (let keys in users) {
 		if (users[keys] === dataFromClient.username) {
@@ -141,19 +142,19 @@ export const userRegisterHandler = (
 		`${dataFromClient.username} joined the Game as Player ${dataFromClient.player} with UID ${userID}`
 	)
 	if (dataFromClient.player === 1 || dataFromClient.player === 2) {
-		if (dataFromClient.player === 1){
-		players = {...players, player1:clients[userID]}
-		}else if(dataFromClient.player === 2) {
-			players = {...players, player2:clients[userID]}
+		if (dataFromClient.player === 1) {
+			players = {...players, player1: clients[userID]}
+		} else if (dataFromClient.player === 2) {
+			players = {...players, player2: clients[userID]}
 		}
 		playersReady++
-		console.log("playersReady", playersReady)
+		console.log(`playersReady ${playersReady}`)
 	}
 	let spec = clients[userID]
 	if (dataFromClient.player === 'spectator') {
 		spectators[userID] = spec
 	}
-	console.log('spectators: ', spectators)
+	console.log('spectators: ',spectators)
 	json1.data = {
 		username: users[userID],
 		userid: userID,
@@ -162,11 +163,10 @@ export const userRegisterHandler = (
 		userActivity
 	} //add user +activity to the data of our response
 	let msg = {type: 'chat'}
+	console.warn('hehr')
+	console.log(defaultChatMsg)
 	msg.data = {
-		chat: [
-			'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
-			'Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. '
-		]
+		chat: defaultChatMsg
 	}
 	console.log(msg)
 	sendMessage(JSON.stringify(msg)) //sending game instructions directly to chat

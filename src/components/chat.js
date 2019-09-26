@@ -1,15 +1,6 @@
 //Chat
-import ListItemText from '@material-ui/core/ListItemText'
-import CardActions from '@material-ui/core/CardActions'
-import CardContent from '@material-ui/core/CardContent'
-import Typography from '@material-ui/core/Typography'
-import TextField from '@material-ui/core/TextField'
-import {makeStyles} from '@material-ui/core/styles'
-import Container from '@material-ui/core/Container'
-import ListItem from '@material-ui/core/ListItem'
 import React, {useState, useEffect} from 'react'
-import List from '@material-ui/core/List'
-import Card from '@material-ui/core/Card'
+import {ListItemText,CardActions,CardContent,Typography,TextField,makeStyles, Container,ListItem,List,Card} from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
 	textField: {
@@ -78,8 +69,7 @@ export const Chat = (props) => {
 					<Typography className={classes.title}>
 						spectator Chat
 					</Typography>
-					<List className={classes.root} id="chat"
-					>
+					<List className={classes.root} id="chat">
 						{props.history.map((item) => (
 							<ListItem
 								key={`item${hstryLength() *
