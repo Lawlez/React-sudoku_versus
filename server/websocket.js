@@ -100,7 +100,6 @@ export const WebSocketSrv = async (
 				//>>>works
 				await newChatHandler(
 					userID,
-					sudokuHandler,
 					currentBoard,
 					dataFromClient
 				)

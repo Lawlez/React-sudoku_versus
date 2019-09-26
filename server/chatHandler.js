@@ -1,5 +1,5 @@
 //server-side Chat handler
-import {getBoard} from './sudokuHandler'
+import {getBoard, getSolution} from './sudokuHandler'
 import {sendMessage, playersReady, users} from './server'
 import gameTimer, {startTimer, stopTimer, handleAttacks} from './srvHelpers'
 import {defaultChatMsg} from '../config'
@@ -63,18 +63,7 @@ const chatCommands = {
 	},
 	solve: (params) => {
 		console.log('/solve detected')
-		const klsudoku = require('klsudoku')
-		let solverMask = [].concat(...params.board)
-		console.log(`mask ${solverMask}`)
-		solverMask = solverMask.toString()
-		solverMask = solverMask.replace(/,/g, '')
-		console.log(`stringmask ${solverMask}`)
-		let solution = klsudoku.solve(solverMask)
-		solution = solution.solution
-		let tiles = solution.match(/.{1,9}/g)
-		let board = tiles.map((tile) => tile.split('').map((t) => Number(t)))
-		console.log(`sol var ${solution}`)
-
+		board = getSolution(true)
 		let json = {
 			type: 'gamemove'
 		}
@@ -107,7 +96,6 @@ const sendChatMessage = (params) => {
 }
 export const newChatHandler = async (
 	userID,
-	sudokuHandler,
 	currentBoard,
 	dataFromClient
 ) => {
@@ -119,7 +107,7 @@ export const newChatHandler = async (
 		dataFromClient: dataFromClient
 	}
 	let detectedCommand = Object.keys(chatCommands).find(
-		(commandName) => dataFromClient.msg === `/${commandName}`
+		commandName => dataFromClient.msg === `/${commandName}`
 	)
 	if (detectedCommand) {
 		chatCommands[detectedCommand](params)
