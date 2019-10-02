@@ -1,7 +1,7 @@
 //server-side Chat handler
 import {getBoard, getSolution} from './sudokuHandler'
 import {sendMessage, playersReady, users} from './server'
-import gameTimer, {startTimer, stopTimer, handleAttacks} from './srvHelpers'
+import {startTimer, stopTimer, handleAttacks} from './srvHelpers'
 import {defaultChatMsg} from '../config'
 let messageHistory = [...defaultChatMsg]
 
@@ -79,7 +79,7 @@ export const newChatHandler = async (
 		commandName => dataFromClient.msg.replace(/ .*/,'') === `/${commandName}`
 		
 	)
-	console.log("dataFromClient.msg.replace(/ .*/,'')", dataFromClient.msg.replace(/ .*/,''));
+	console.log('dataFromClient.msg.replace(/ .*/,\'\')', dataFromClient.msg.replace(/ .*/,''))
 	if (detectedCommand) {
 		chatCommands[detectedCommand](params)
 	} else {

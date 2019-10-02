@@ -57,15 +57,15 @@ export const sudokuMaster = (sudoku) => {
 }
 const getLocalBoard = ()=>{//FALLBACK if API is down
 	let result = klsudoku.generate()
-		console.log(result)
-		puzzle = result.puzzle
-		solution = result.solution
-		result = klsudoku.solve(puzzle)
-		let tiles = puzzle.match(/.{1,9}/g)
-		let board = tiles.map((tile) =>
+	console.log(result)
+	puzzle = result.puzzle
+	solution = result.solution
+	result = klsudoku.solve(puzzle)
+	let tiles = puzzle.match(/.{1,9}/g)
+	let board = tiles.map((tile) =>
 		tile.split('').map((t) => (t === '.' ? null : Number(t)))
-		)
-		return board
+	)
+	return board
 }
 //GET NEW BOARD FROM ONLINE API
 export const getBoard = (difficulty = 'easy') => {
@@ -76,7 +76,7 @@ export const getBoard = (difficulty = 'easy') => {
 			currentBoard = json.board
 			return json.board
 		})
-		.catch((e) => getLocalBoard()) //fall back to local generator in case API goes OFFLINE
+		.catch(() => getLocalBoard()) //fall back to local generator in case API goes OFFLINE
 }
 export const endGame = (
 	userActivity,
@@ -88,9 +88,9 @@ export const endGame = (
 	let player1Win = sudokuMaster(gameField1)
 	let player2Win = sudokuMaster(gameField2)
 	if (player2Win === true) {
-		userActivity.push(`Player 2 has WON the game! Congratulations!`)
+		userActivity.push('Player 2 has WON the game! Congratulations!')
 	} else if (player1Win === true) {
-		userActivity.push(`Player 1 has WON the game! Congratulations!`)
+		userActivity.push('Player 1 has WON the game! Congratulations!')
 	} else {
 		userActivity.push(
 			`Nobody filled the board correctly.. Player1:${player1Win} Player2:${player2Win}`

@@ -1,11 +1,8 @@
 import {
 	playersReady,
 	sendMessage,
-	spectators,
-	players,
 	gameField1,
 	gameField2,
-	dataFromClient,
 	userActivity,
 	json,
 	clients

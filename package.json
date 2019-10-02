@@ -19,6 +19,7 @@
     "lint": "eslint './src/**/*.js'",
      "lintserver": "eslint './server/**/*.js'",
     "fix": "eslint --fix-dry-run './src/**/*.js'",
+    "fixserver": "eslint --fix './server/**/*.js'",
     "server": "nodemon --exec babel-node server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",

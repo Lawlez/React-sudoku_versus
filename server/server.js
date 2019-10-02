@@ -1,6 +1,5 @@
 //server
 import WebSocketSrv from './websocket'
-const klsudoku = require('klsudoku')
 ///////// SENDING GENERAL RESPONSES /////////////
 export const sendMessage = (json) => {
 	// We are sending the current data to all connected clients
