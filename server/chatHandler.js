@@ -1,10 +1,10 @@
 //server-side Chat handler
 import {getBoard, getSolution} from './sudokuHandler'
-import {sendMessage, playersReady, users} from './server'
+import {webSocket} from './server'
 import {startTimer, stopTimer, handleAttacks} from './srvHelpers'
 import {defaultChatMsg} from '../config'
 let messageHistory = [...defaultChatMsg]
-
+let currentBoard
 /////////// chat commands & callbacks ///////////
 const chatCommands = {
 	start: (params) => {
@@ -19,15 +19,17 @@ const chatCommands = {
 	},
 	newboard: async (params) => {
 		console.log(`${params.dataFromClient.msg} detected`)
-		let diff = params.dataFromClient.msg.replace(/(\w+)(\W)\b/g,'').replace(/[/]/,'') //regex find last word in str
-		console.log('diff is:',diff) 
-		let currentBoard = await getBoard((diff !== 'easy' & diff !== 'medium' & diff !== 'hard') ? 'easy' : diff)
+		let match = params.dataFromClient.msg.match(
+			/newboard (easy|medium|hard)/
+		)
+		let diff = match && match[1] ? match[1] : 'easy'
+		let currentBoard = await getBoard(diff)
 		let json = {
 			type: 'info',
 			players: params.players,
 			board: currentBoard
 		}
-		sendMessage(JSON.stringify(json))
+		webSocket.sendMessage(json)
 		sendChatMessage(params)
 	},
 	solve: (params) => {
@@ -41,45 +43,52 @@ const chatCommands = {
 			player: params.dataFromClient.player,
 			gamefield: board
 		}
-		sendMessage(JSON.stringify(json))
+		webSocket.sendMessage(json)
 		sendChatMessage(params)
 	},
 	attack: (params) => {
 		console.log('attack detected')
 		handleAttacks(params.dataFromClient)
+		sendChatMessage(params)
+	},
+	resetsrv: () => {
+		console.log('stopping server')
+		stopTimer()
+		webSocket.stop()
+		console.log('starting server')
+		webSocket.start()
 	}
 }
+
 const sendChatMessage = (params) => {
-	messageHistory = [...messageHistory, `${params.username}: ${params.dataFromClient.msg}`]
+	messageHistory = [
+		...messageHistory,
+		`${params.username}: ${params.dataFromClient.msg}`
+	]
 	let json = {
-		type: 'chat'
-	}
-	json.data = {
-		username: params.username,
-		'user-id': params.userid,
-		player: params.dataFromClient.player,
-		chat: messageHistory
+		type: 'chat',
+		data: {
+			username: params.username,
+			'user-id': params.userid,
+			player: params.dataFromClient.player,
+			chat: messageHistory
+		}
 	}
 	console.log('sendChatMessage returns:', json)
-	sendMessage(JSON.stringify(json))
+	webSocket.sendMessage(json)
 }
-export const newChatHandler = async (
-	userID,
-	currentBoard,
-	dataFromClient
-) => {
+export const newChatHandler = async (dataFromClient, playersReady) => {
 	const params = {
-		username: users[userID],
+		username: dataFromClient.username,
 		board: currentBoard,
 		players: playersReady,
-		userid: userID,
+		userid: webSocket.getClientByType('username', dataFromClient.username).userid,
 		dataFromClient: dataFromClient
 	}
+	let cmd = dataFromClient.msg.replace(/ .*/, '')
 	let detectedCommand = Object.keys(chatCommands).find(
-		commandName => dataFromClient.msg.replace(/ .*/,'') === `/${commandName}`
-		
+		(commandName) => cmd === `/${commandName}`
 	)
-	console.log('dataFromClient.msg.replace(/ .*/,\'\')', dataFromClient.msg.replace(/ .*/,''))
 	if (detectedCommand) {
 		chatCommands[detectedCommand](params)
 	} else {

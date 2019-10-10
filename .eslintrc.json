@@ -14,7 +14,7 @@
             "experimentalObjectRestSpread": true,
             "jsx": true
         },
-        "ecmaVersion": 2020,
+        "ecmaVersion": 9,
         "sourceType": "module"
     },
     "plugins": [

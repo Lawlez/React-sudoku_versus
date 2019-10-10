@@ -26,7 +26,7 @@ const InputField = (props) => {
 				return
 			}
 			if (input > 9 || input === 0) {
-				console.error(`Bitte Geben Sie eine zahl zwischen 1 und 9 ein`)
+				console.error('Bitte Geben Sie eine zahl zwischen 1 und 9 ein')
 				setValue('')
 				return
 			}
