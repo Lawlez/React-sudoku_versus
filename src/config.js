@@ -1,4 +1,4 @@
-//////////SERVER_SIDE config file////////
+//////////config file////////
 //default chat msg
 export const defaultChatMsg = [
 	'Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.',
@@ -13,8 +13,14 @@ export const reqTypes = {
 	RESET: 'resetgame',
 	CHAT: 'chat',
 	ENDGAME: 'endgame',
-	READY: 'ready',
-	READYUP: 'readyup'
+	READY: 'ready'
+}
+export const attackTypes = {
+	SHAKE: 'shakes the playfield',
+	BLACK: 'People like Darkmode right?',
+	SWITCH: 'switches playfield values',
+	COOL: 'onCooldown',
+	MEME: 'display distracting memes & gifs',
 }
 
 export const DEV_ENV = true

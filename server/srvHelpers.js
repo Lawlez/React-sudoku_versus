@@ -1,25 +1,18 @@
 import {
 	playersReady,
-	sendMessage,
-	spectators,
-	players,
-	gameField1,
-	gameField2,
-	dataFromClient,
-	userActivity,
 	json,
-	clients
+	webSocket,
 } from './server'
+import activityHandler, {userActivity} from './activityHandler'
 import {defaultChatMsg} from '../config'
 ////////TIMER FUNCTION///////////
 let playTimer = 0
 let startTime = null
 export const gameTimer = () => {
-	//[[[[[[[[>>>works]]]]]]]]
 	playTimer = playTimer + 1
 	playTimer.toFixed(3)
-	console.log(playTimer) ///wait 1 seconds until cleint is rdy to recieve
-	sendMessage(JSON.stringify({type: 'time', time: playTimer}))
+	console.log(playTimer)
+	webSocket.sendMessage({type: 'time', time: playTimer})
 }
 export const startTimer = () => {
 	startTime = setInterval(gameTimer, 1000)
@@ -34,148 +27,134 @@ if (playersReady <= 2) {
 	clearInterval(startTime)
 }
 
-/////////////////////////////////
-
 // generates unique userid for everyuser.
 export const getUniqueID = () => {
-	//[[[[[[[[>>>works]]]]]]]]
 	const s4 = () =>
 		Math.floor((1 + Math.random()) * 0x10000)
 			.toString(16)
 			.substring(1)
 	return s4() + '-' + s4()
 }
-
-//// SeNDING RESPONSE TO GAME MOVES ////////
-export const sendGameMove = (json, players, spectators) => {
-	let i = 0
-	console.log(players, spectators)
-	console.log('im sending', json)
-	for (let player in players) {
-		players[player].sendUTF(JSON.stringify(json))
-		i++
-		console.log(`${i} times`)
-	}
-	/*
-		Object.keys(players).map((player) => {
-			//console.log('playersend', player)
-			players[player].sendUTF(JSON.stringify(json))
-		})*/
-	json.field = {
-		gamefield1: gameField1,
-		gamefield2: gameField2
-	}
-
-	/*for (let spec in spectators) {
-		spectators[spec].sendUTF(JSON.stringify(json))
-		i++
-		console.log(i, 'times')
-	}*/
-
-	Object.keys(spectators).map((spectator) => {
-		console.log(`spectatorsend ${spectators[spectator]}`)
-		i++
-		console.log(`${i} times`)
-		spectators[spectator].sendUTF(JSON.stringify(json))
-	})
-}
 //////////////////// attacks /////////////////////
 export const attackTypes = {
-	//defining attack types
-	STROBO: 'stroboscope',
-	DELETE: 'delete random entry',
+	BLACK: 'People like Darkmode right?',
 	SHAKE: 'shakes the playfield',
 	SWITCH: 'switches playfield values',
-	MEME: 'display distracting memes & gifs'
+	MEME: 'display distracting memes & gifs',
 }
-
-//TODO SOLVER & GENERATOR
-
+let lastAttack = Number(0)
+const attackCooldown = () => {
+	lastAttack = lastAttack + 33
+	console.log(lastAttack)
+}
 export const handleAttacks = (dataFromClient) => {
-	//[[[[[[[[>>>works]]]]]]]]
+	let canAttack
+	if (!canAttack) {
+		canAttack = setTimeout(attackCooldown, 5000)
+	}
 	let json1 = json
-	const randomAttack = (obj) => {
-		let attackKey = Object.keys(obj)
-		return obj[attackKey[(attackKey.length * Math.random()) << 0]]
+	let currentAttack
+	if (lastAttack > 30) {
+		lastAttack = 0
+		clearTimeout(canAttack)
+		const randomAttack = (obj) => {
+			let attackKey = Object.keys(obj)
+			return obj[attackKey[(attackKey.length * Math.random()) << 0]]
+		}
+		currentAttack = randomAttack(attackTypes)
+		if (currentAttack === attackTypes.SWITCH) {
+			let p1 = webSocket.getClientByType('player', 1)
+			console.log('p1', p1.moves)
+			let p2 = webSocket.getClientByType('player', 2)
+			console.log('p2', p2.moves)
+			let msg = {type: 'gamemove'}
+			let p1moves = {...p1.moves}
+			let p2moves = {...p2.moves}
+			//switching clientside
+			for (let i = 1; i < 3; i++) {
+				msg.data = {
+					player: i,
+					gameField: i > 1 ? p1moves : p2moves,
+				}
+				webSocket.sendMessage(msg)
+			}
+			console.log('p1', p1moves)
+			console.log('p2', p2moves)
+			msg.data = {
+				gameField1: p2moves,
+				gameField2: p1moves,
+			}
+			webSocket.sendMessage(msg, 'spectator')
+			//switching server side
+			webSocket.setClients(p1.userid, 'moves', p2moves)
+			webSocket.setClients(p2.userid, 'moves', p1moves)
+		}
+
+		activityHandler(
+			`${dataFromClient.username} launched an ATTACK: ${currentAttack}`,
+		)
+	}
+	let target = () => {
+		return Math.random() > 0.5 ? 1 : 2
 	}
 
-	let currentAttack = randomAttack(attackTypes)
-	console.log(currentAttack)
-
-	userActivity.push(
-		`${dataFromClient.username} launched an ATTACK: ${currentAttack}`
-	)
 	json1 = {type: 'attack'}
 	json1.data = {
 		user: dataFromClient.username,
-		player: dataFromClient.player,
-		attack: currentAttack,
-		userActivity
+		player: target(),
+		attack: currentAttack ? currentAttack : 'onCooldown',
+		userActivity,
 	}
-	console.log(json1)
-	sendMessage(JSON.stringify(json1))
+	webSocket.sendMessage(json1)
 }
 
 export const userRegisterHandler = (
 	dataFromClient,
-	users,
+	clients,
 	userID,
 	playersReady,
-	spectators,
-	players
+	json,
 ) => {
-	//[[[[[[[[>>>works]]]]]]]]
+	clients = webSocket.getClients()
 	let json1 = json
-	for (let keys in users) {
-		if (users[keys] === dataFromClient.username) {
-			json1.data = {
-				username: 'UsrNameTaken',
-				'user-id': userID,
-				userActivity
-			}
-			clients[userID].sendUTF(JSON.stringify(json1)) //only send to client that sent request
-			return
+	if (webSocket.getClientByType('username', dataFromClient.username)) {
+		json1.data = {
+			username: 'UsrNameTaken',
+			'user-id': userID,
+			userActivity,
 		}
+		webSocket.sendMessage(json1, {userid: userID})
+		return
 	}
-	users[userID] = dataFromClient.username
-	userActivity.push(
-		`${dataFromClient.username} joined the Game as Player ${dataFromClient.player} with UID ${userID}`
+	webSocket.setClients(userID, 'username', dataFromClient.username)
+
+	let activity = activityHandler(
+		`${dataFromClient.username} joined the Game as Player ${dataFromClient.player} with UID ${userID}`,
 	)
-	if (dataFromClient.player === 1 || dataFromClient.player === 2) {
-		if (dataFromClient.player === 1) {
-			players = {...players, player1: clients[userID]}
-		} else if (dataFromClient.player === 2) {
-			players = {...players, player2: clients[userID]}
-		}
-		playersReady++
-		console.log(`playersReady ${playersReady}`)
-	}
-	let spec = clients[userID]
 	if (dataFromClient.player === 'spectator') {
-		spectators[userID] = spec
+		webSocket.setClients(userID, 'player', 'spectator')
+	} else if (
+		!isNaN(dataFromClient.player) &&
+		dataFromClient.player <= 2 &&
+		dataFromClient.player > 0
+	) {
+		webSocket.setClients(userID, 'player', dataFromClient.player)
+		webSocket.incrementPlayers()
 	}
-	console.log('spectators: ',spectators)
 	json1.data = {
-		username: users[userID],
+		username: dataFromClient.username,
 		userid: userID,
 		player: dataFromClient.player,
 		playersReady: playersReady,
-		userActivity
+		userActivity: activity,
 	} //add user +activity to the data of our response
 	let msg = {type: 'chat'}
-	console.warn('hehr')
-	console.log(defaultChatMsg)
 	msg.data = {
-		chat: defaultChatMsg
+		chat: defaultChatMsg,
 	}
-	console.log(msg)
-	sendMessage(JSON.stringify(msg)) //sending game instructions directly to chat
+	webSocket.sendMessage(msg, {userid: userID}) //sending game instructions directly to chat
 	let output = {
 		json: json1.data,
-		spectators: spectators,
-		players: players,
-		activity: userActivity,
-		playersrdy: playersReady
 	}
 	return output
 }

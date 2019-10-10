@@ -30,7 +30,8 @@ body {
 }
 
 .row {
-	display: flex;
+	display: inline-flex;
+	display: -webkit-inline-box;
 }
 
 .fieldContainer {
@@ -101,6 +102,25 @@ body {
 	margin-right: 10px;
 }
 
+.memes {
+	display: grid;
+	grid-template-columns: repeat(6, 3fr);
+	grid-template-rows: repeat(6, 15vw);
+	grid-gap: 30px;
+	padding: 50px;
+}
+
+.memecontainer {
+	position: absolute;
+}
+
+.meme {
+	display: flex;
+	width: 240px;
+	margin-bottom: 160px;
+	z-index: 3432;
+}
+
 .userActivity {
 	display: flex;
 	padding: 2px;
@@ -127,6 +147,49 @@ body {
 	color: rgba(0, 0, 0, 1);
 	font-size: 42px !important;
 	display: inline-flex;
+}
+
+.black {
+	background: #000 !important;
+	color: #000 !important;
+	background-color: #000;
+}
+
+.black div {
+	color: #000;
+	background: #000;
+}
+
+.black input {
+	color: #000 !important;
+	background: #000 !important;
+}
+
+.black button {
+	color: #000;
+	background: #888 !important;
+}
+
+.getReady {
+	background: rgba(80, 80, 80, 0.6);
+	height: 500px;
+	padding-top: 100px;
+	width: 100%;
+	display: block;
+	align-content: center;
+	position: absolute;
+	margin-left: auto;
+	margin-right: auto;
+	top: 60px;
+	backdrop-filter: blur(5px);
+}
+
+.readyBtn button {
+	margin-left: auto;
+	margin-right: auto;
+	display: block;
+	padding-right: 10px;
+	padding-left: 10px;
 }
 
 @media (max-width: 720px) {
@@ -172,7 +235,8 @@ body {
 		display: inline-flex;
 	}
 }
-/*fuck apples IOS overrides*/
+
+/* fuck apples IOS overrides */
 textarea,
 input[type='text'] .input-checkbox {
 	-webkit-appearance: none !important;

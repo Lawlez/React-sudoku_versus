@@ -1,4 +1,6 @@
 //sudokuHandler
+import {webSocket} from './server'
+import {activityHandler, userActivity} from './activityHandler'
 const fetch = require('node-fetch')
 const klsudoku = require('klsudoku')
 export let currentBoard = [] //board as soon as players regenerate (replaces initialBoard)
@@ -57,15 +59,15 @@ export const sudokuMaster = (sudoku) => {
 }
 const getLocalBoard = ()=>{//FALLBACK if API is down
 	let result = klsudoku.generate()
-		console.log(result)
-		puzzle = result.puzzle
-		solution = result.solution
-		result = klsudoku.solve(puzzle)
-		let tiles = puzzle.match(/.{1,9}/g)
-		let board = tiles.map((tile) =>
+	console.log(result)
+	puzzle = result.puzzle
+	solution = result.solution
+	result = klsudoku.solve(puzzle)
+	let tiles = puzzle.match(/.{1,9}/g)
+	let board = tiles.map((tile) =>
 		tile.split('').map((t) => (t === '.' ? null : Number(t)))
-		)
-		return board
+	)
+	return board
 }
 //GET NEW BOARD FROM ONLINE API
 export const getBoard = (difficulty = 'easy') => {
@@ -76,25 +78,25 @@ export const getBoard = (difficulty = 'easy') => {
 			currentBoard = json.board
 			return json.board
 		})
-		.catch((e) => getLocalBoard()) //fall back to local generator in case API goes OFFLINE
+		.catch(() => getLocalBoard()) //fall back to local generator in case API goes OFFLINE
 }
 export const endGame = (
-	userActivity,
-	gameField1,
-	gameField2,
 	dataFromClient
 ) => {
-	let json = {}
-	let player1Win = sudokuMaster(gameField1)
-	let player2Win = sudokuMaster(gameField2)
+	let json = {type:'endgame'}
+	let gameField1 = webSocket.getClientByType('player', 1)
+	let gameField2 = webSocket.getClientByType('player', 2)
+	let player1Win = (gameField1 && gameField1.moves) ? sudokuMaster(gameField1.moves) : 'board is empty.. booohoo'
+	let player2Win = (gameField2 && gameField2.moves) ? sudokuMaster(gameField2.moves) : 'board is empty..'
 	if (player2Win === true) {
-		userActivity.push(`Player 2 has WON the game! Congratulations!`)
+		activityHandler('Player 2 has WON the game!🥳 Congratulations!')
 	} else if (player1Win === true) {
-		userActivity.push(`Player 1 has WON the game! Congratulations!`)
+		activityHandler('Player 1 has WON the game!🥳 Congratulations!')
 	} else {
-		userActivity.push(
-			`Nobody filled the board correctly.. Player1:${player1Win} Player2:${player2Win}`
+		activityHandler(
+			`Guys 🙄 nobody filled the board correctly.. Player1:${player1Win} Player2:${player2Win}, how dare you submit wrong answers @Player ${dataFromClient.player}? now deal with this🤷💀 `
 		)
+		webSocket.punish(dataFromClient.player)
 	}
 	json.data = {
 		player: dataFromClient.player,
@@ -102,5 +104,6 @@ export const endGame = (
 		player2: player2Win,
 		userActivity
 	}
-	return json.data
+	webSocket.sendMessage(json)
+
 }

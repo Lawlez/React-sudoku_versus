@@ -1,5 +1,14 @@
 ## Sudoku Versus 
+Multiplayer React WS Sudoku Game 
 
+Features:
+- randomly generated solvable sudokus in 3 difficulties
+- auto solving of said sudokus
+- pvp sudoku games , get the best time & beat your friend.
+- includes Chat for players & spectators
+- Spectators can watch the game live & attack the players
+- runs with React 16.9 & webSocket & NodeJS
+- chat commands: /newboard (easy | hard | medium), /start, /stop, /solve, /attack(spectators only)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -38,3 +47,5 @@ The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+-Dominik Feger
