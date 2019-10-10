@@ -24,6 +24,7 @@ export const MyButton = (props) => {
 			variant="contained"
 			color={props.color}
 			onClick={props.onClick}
+			disabled={props.cooldown}
 		>
 			{props.text}
 		</Button>

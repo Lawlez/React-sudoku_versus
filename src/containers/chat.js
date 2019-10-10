@@ -1,7 +1,20 @@
 //Chat
-import React, {useState, useEffect} from 'react'
-import {ListItemText,CardActions,CardContent,Typography,TextField,makeStyles, Container,ListItem,List,Card} from '@material-ui/core'
-
+import React, { useEffect} from 'react'
+import { connect } from 'react-redux'
+import { setChatHistory, setChatMessage } from '../store/chat/chatActions'
+import {
+	ListItemText,
+	CardActions,
+	CardContent,
+	Typography,
+	TextField,
+	makeStyles,
+	Container,
+	ListItem,
+	List,
+	Card
+} from '@material-ui/core'
+import {sendChatMessage} from './handlers'
 const useStyles = makeStyles((theme) => ({
 	textField: {
 		marginLeft: theme.spacing(1),
@@ -35,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Chat = (props) => {
-	const [userMessage, setUserMessage] = useState('')
+	//const [userMessage, setUserMessage] = useState('')
 	const classes = useStyles()
 
 	useEffect(() => {
@@ -48,14 +61,14 @@ export const Chat = (props) => {
 	}
 
 	const hstryLength = () => {
-		return props.history.length
+		return props.chat.chatHistory.length
 	}
-	const handleChatMessage = (e) => {
-		if (!userMessage) {
+	const handleChatMessage = () => {
+		if (!props.chat.chatMessage) {
 			return console.warn('message cannot be emtpy')
 		}
-		props.onMessage(userMessage)
-		setUserMessage('')
+		sendChatMessage(props.chat.chatMessage, props.userName, props.playerN)
+		props.setChatMessage('')
 	}
 	const handleEnterMessage = (e) => {
 		if (e.keyCode === 13 || e.which === 13) {
@@ -70,7 +83,7 @@ export const Chat = (props) => {
 						spectator Chat
 					</Typography>
 					<List className={classes.root} id="chat">
-						{props.history.map((item) => (
+						{props.chat.chatHistory.map((item) => (
 							<ListItem
 								key={`item${hstryLength() *
 									Math.random()}-${item}${hstryLength()}`}
@@ -88,8 +101,8 @@ export const Chat = (props) => {
 						className={classes.textField}
 						margin="normal"
 						variant="outlined"
-						value={userMessage}
-						onChange={(e) => setUserMessage(e.target.value)}
+						value={props.chat.chatMessage}
+						onChange={(e) => props.setChatMessage(e.target.value)}
 						onKeyPress={(e) => handleEnterMessage(e)}
 					/>
 				</CardActions>
@@ -97,5 +110,21 @@ export const Chat = (props) => {
 		</Container>
 	)
 }
-
-export default Chat
+const mapStateToProps = (state) => {
+	return {
+		chat: state.chat,
+		userName: state.user.userName,
+		playerN: state.user.playerNumber
+	}
+}
+const mapDispatchToProps = (dispatch) => {
+	return {
+		setChatHistory: (history) => {
+			dispatch(setChatHistory(history))
+		},
+		setChatMessage: (activity) => {
+			dispatch(setChatMessage(activity))
+		},
+	}
+}
+export default connect(mapStateToProps,mapDispatchToProps)(Chat)

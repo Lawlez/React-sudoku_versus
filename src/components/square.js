@@ -50,6 +50,6 @@ export const NewSquare = (props) => {
 			)
 		}
 	}
-	return <div className="squareWrapper">{field}</div>
+	return <div className={'squareWrapper ' + props.shake}>{field}</div>
 }
 export default NewSquare

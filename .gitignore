@@ -1,3 +1,5 @@
 
 prototypes2/
 prototypes/
+*.sublime-workspace
+*.sublime-project

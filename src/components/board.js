@@ -35,10 +35,10 @@ const RenderBoard = (props) => {
 					key={cellID}
 					value={cellVal}
 					player={props.player}
+					shake={props.shake}
 				/>
 			)
 		}
-
 		rows.push(
 			<div key={rowID} className="row">
 				{square}
@@ -47,5 +47,4 @@ const RenderBoard = (props) => {
 	}
 	return <div>{rows}</div>
 }
-
 export default RenderBoard
