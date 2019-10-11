@@ -24,7 +24,6 @@ export const getSolution = (getBoard = null) => {
 }
 
 export const sudokuMaster = (sudoku) => {
-	//>>>works
 	console.log('inside master')
 	if (Object.keys(sudoku).length > 0) {
 		console.log('sudoku true')
@@ -67,15 +66,17 @@ const getLocalBoard = ()=>{//FALLBACK if API is down
 	let board = tiles.map((tile) =>
 		tile.split('').map((t) => (t === '.' ? null : Number(t)))
 	)
+	console.timeEnd('\ngenerating sudoku took')
 	return board
 }
 //GET NEW BOARD FROM ONLINE API
 export const getBoard = (difficulty = 'easy') => {
-	//>>>works
+	console.time('\ngenerating sudoku took')
 	return fetch(`https://sugoku.herokuapp.com/board?difficulty=${difficulty}`)
 		.then((response) => response.json())
 		.then((json) => {
 			currentBoard = json.board
+			console.timeEnd('\ngenerating sudoku took')
 			return json.board
 		})
 		.catch(() => getLocalBoard()) //fall back to local generator in case API goes OFFLINE

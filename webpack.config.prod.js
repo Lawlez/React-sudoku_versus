@@ -1,11 +1,13 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const Analyzer = require('webpack-bundle-analyzer')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 module.exports = {
 	entry: './src/index.js',
-	mode: 'development',
+	mode: 'production',
 	target: 'web',
 	output: {
-		path: path.join(__dirname, 'dist'),
+		path: path.join(__dirname, 'build'),
 		filename: 'bundle.js',
 	},
 	plugins: [
@@ -13,11 +15,23 @@ module.exports = {
 			template: 'public/index.html',
 			title: 'Sudoku Versus',
 			meta: {
-				'viewport':
+				viewport:
 					'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 				'Content-Security-Policy':
 					'default-src none; script-src self; connect-src self 192.168.100.211 ws://192.168.100.211:8080 http://www.reddit.com; img-src self http://www.reddit.com https://i.redd.it data: http://192.168.100.211:3000; style-src self unsafe-inline; manifest-src self',
 			},
+			minify: {
+				removeComments: true,
+				collapseWhitespace: true,
+				useShortDoctypes: true,
+				minifyJS: true,
+				minifyCSS: true,
+				minifyURLs: true,
+			},
+		}),
+		new Analyzer.BundleAnalyzerPlugin({analyzerMode: 'static'}),
+		new MiniCssExtractPlugin({
+			filename: '[name].[contenthash].css',
 		}),
 	],
 	resolve: {
@@ -40,7 +54,22 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: ['style-loader', 'css-loader'],
+				use: [
+					MiniCssExtractPlugin.loader,
+					{
+						loader: 'css-loader',
+						options: {
+							sourceMap: true,
+						},
+					},
+					{
+						loader: 'postcss-loader',
+						options: {
+							plugins: () => [require('cssnano')],
+							sourceMap: true,
+						},
+					},
+				],
 			},
 			{
 				test: /\.html$/,
@@ -48,14 +77,14 @@ module.exports = {
 			},
 		],
 	},
-	devtool: 'cheap-module-eavl-source-map',
+	devtool: 'source-map',
 	devServer: {
-		contentBase: path.join(__dirname, 'dist'),
+		contentBase: path.join(__dirname, 'build'),
 		overlay: true,
 		hot: true,
 		open: true,
-		//compress: true,
+		compress: true,
 		port: 3000,
-		https:false,
+		https: false,
 	},
 }

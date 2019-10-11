@@ -8,7 +8,7 @@ export const GetReady = (props) => {
 	}
 	return (
 		<div className="getReady">
-			<div className="readyBtn"><MyButton color="primary" onClick={()=>{imReady(props.setReady)}} text="Ready Up!"/></div>
+			<div className="readyBtn"><MyButton color="primary" onClick={()=>{imReady()}} text="Ready Up!"/></div>
 		</div>
 	)
 }
