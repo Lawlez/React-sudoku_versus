@@ -1,4 +1,4 @@
-//handlers //>>>works
+//handlers
 import React from 'react'
 import {client} from '../index'
 import {attackTypes} from '../config'
@@ -36,8 +36,8 @@ export const getDankMemes = async (setMemes) => {
 		}
 		posts.forEach((imageurl) => {
 			memes.push(
-				<img src={imageurl} className={classes}/>
-				)
+				<img key={imageurl} src={imageurl} className={classes}/>
+			)
 		})
 		console.log(memes)
 		return memes
@@ -48,8 +48,8 @@ export const getDankMemes = async (setMemes) => {
 			setMemes(redditData)
 		})
 		.catch((e) => console.log('Booo', e))
-		console.log('fetch', fetchMemes)
-		return redditData
+	console.log('fetch', fetchMemes)
+	return redditData
 }
 
 export const sendMessage = (
@@ -86,6 +86,10 @@ export const resetGame = (userName, playerNumber) => {
 	sendMessage(userName, playerNumber, 'resetgame')
 }
 
+export const deleteValue = (cell, userName, playerNumber) => {
+	sendMessage(userName, playerNumber, 'gamemove', '', '', cell)
+}
+
 export const endGame = (userName, playerNumber, fieldInput) => {
 	if (!fieldInput) {
 		console.warn('fill the board first bro')
@@ -104,36 +108,32 @@ export const launchAttack = (userName, playerNumber) => {
 export const handleAttacks = (dataFromServer) => {
 	let attack = dataFromServer.data.attack
 	switch (attack) {
-		case attackTypes.SHAKE:
-			return {
-				state: true,
-				target: dataFromServer.data.player,
-				type: 'SHAKE',
-			}
-		case attackTypes.COOL:
-			return 'onCooldown'
-		case attackTypes.BLACK:
-			return {
-				state: true,
-				target: dataFromServer.data.player,
-				type: 'BLACK',
-			}
+	case attackTypes.SHAKE:
+		return {
+			state: true,
+			target: dataFromServer.data.player,
+			type: 'SHAKE',
+		}
+	case attackTypes.COOL:
+		return 'onCooldown'
+	case attackTypes.BLACK:
+		return {
+			state: true,
+			target: dataFromServer.data.player,
+			type: 'BLACK',
+		}
 
-		case attackTypes.MEME:
-			return {
-				state: true,
-				target: dataFromServer.data.player,
-				type: 'MEME'
-			}
-		case attackTypes.SWITCH:
-			return {
-				state: true,
-				target: dataFromServer.data.player,
-				type: 'SWITCH'
-			}
+	case attackTypes.MEME:
+		return {
+			state: true,
+			target: dataFromServer.data.player,
+			type: 'MEME'
+		}
+	case attackTypes.SWITCH:
+		return {
+			state: true,
+			target: dataFromServer.data.player,
+			type: 'SWITCH'
+		}
 	}
-}
-
-export const deleteValue = (cell, userName, playerNumber) => {
-	sendMessage(userName, playerNumber, 'gamemove', '', '', cell)
 }

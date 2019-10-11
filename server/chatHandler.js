@@ -74,7 +74,6 @@ const sendChatMessage = (params) => {
 			chat: messageHistory
 		}
 	}
-	console.log('sendChatMessage returns:', json)
 	webSocket.sendMessage(json)
 }
 export const newChatHandler = async (dataFromClient, playersReady) => {

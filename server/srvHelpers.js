@@ -4,14 +4,13 @@ import {
 	webSocket,
 } from './server'
 import activityHandler, {userActivity} from './activityHandler'
-import {defaultChatMsg} from '../config'
+import {defaultChatMsg, COOLDOWN, attackTypes} from '../config'
 ////////TIMER FUNCTION///////////
 let playTimer = 0
 let startTime = null
 export const gameTimer = () => {
 	playTimer = playTimer + 1
 	playTimer.toFixed(3)
-	console.log(playTimer)
 	webSocket.sendMessage({type: 'time', time: playTimer})
 }
 export const startTimer = () => {
@@ -36,21 +35,16 @@ export const getUniqueID = () => {
 	return s4() + '-' + s4()
 }
 //////////////////// attacks /////////////////////
-export const attackTypes = {
-	BLACK: 'People like Darkmode right?',
-	SHAKE: 'shakes the playfield',
-	SWITCH: 'switches playfield values',
-	MEME: 'display distracting memes & gifs',
-}
+
 let lastAttack = Number(0)
 const attackCooldown = () => {
 	lastAttack = lastAttack + 33
-	console.log(lastAttack)
+	console.log('cooldown over ( ͡° ͜ʖ ͡°)')
 }
 export const handleAttacks = (dataFromClient) => {
 	let canAttack
 	if (!canAttack) {
-		canAttack = setTimeout(attackCooldown, 5000)
+		canAttack = setTimeout(attackCooldown, COOLDOWN)
 	}
 	let json1 = json
 	let currentAttack
@@ -64,9 +58,7 @@ export const handleAttacks = (dataFromClient) => {
 		currentAttack = randomAttack(attackTypes)
 		if (currentAttack === attackTypes.SWITCH) {
 			let p1 = webSocket.getClientByType('player', 1)
-			console.log('p1', p1.moves)
 			let p2 = webSocket.getClientByType('player', 2)
-			console.log('p2', p2.moves)
 			let msg = {type: 'gamemove'}
 			let p1moves = {...p1.moves}
 			let p2moves = {...p2.moves}

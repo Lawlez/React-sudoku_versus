@@ -1,22 +1,30 @@
 //websocket as class
 import http from 'http'
-import {reqTypes} from '../config' //importing constants
+import {
+	reqTypes,
+	SRV_PORT,
+	INITIAL_BOARD,
+	COOLDOWN,
+	DEV_ENV,
+	attackTypes,
+	ATTACK_DURATION,
+} from '../config' //importing constants
 import {
 	getUniqueID,
 	handleAttacks,
 	userRegisterHandler,
-	startTimer
+	startTimer,
 } from './srvHelpers'
 import {newChatHandler} from './chatHandler'
 import {getBoard, endGame, currentBoard} from './sudokuHandler'
-import { activityHandler , userActivity} from './activityHandler'
+import {activityHandler, userActivity} from './activityHandler'
 export class WebSocket {
-	constructor(props) {
+	constructor() {
 		this.clients = []
 		this.initialBoard = this.getInitialBoard()
 		this.playersReady = Number(0)
-		this.ready= Number(0)
-		this.port = 8080
+		this.ready = Number(0)
+		this.port = SRV_PORT
 		this.server = http.createServer()
 		this.webSocketServer = require('websocket').server
 		this.wsServer = new this.webSocketServer({httpServer: this.server})
@@ -24,7 +32,22 @@ export class WebSocket {
 	}
 
 	start() {
+		console.time('started in')
 		this.server.listen(this.port)
+		console.log(
+			'\n*̱̹̦̳ͦͥ̀ͥ͐\n**\n***\nStarted SudokuServer with following settings (∩ᵔ ͜ʖᵔ)⊃━☆ﾟ.*:',
+		)
+		console.table({
+			SRV_PORT,
+			INITIAL_BOARD,
+			COOLDOWN,
+			ATTACK_DURATION,
+			DEV_ENV,
+		})
+		console.table(attackTypes)
+		console.groupEnd()
+		console.timeEnd('started in')
+		console.log('\nヽ(⌣ ͜ʖ⌣”)ﾉ')
 	}
 	stop() {
 		this.server.close()
@@ -32,19 +55,17 @@ export class WebSocket {
 	/*eslint-disable */
 	async getInitialBoard() {
 		/*eslint-enable */
-		return await getBoard('easy') //starting board
+		return await getBoard(INITIAL_BOARD) //starting board
 	}
 	addClient(connection, userID) {
 		this.clients.push({
 			userid: userID,
 			connection: connection,
 		})
-		console.log(`connected: ${userID}from  ${connection.remoteAddress}`)
+		console.log(`connected: ${userID} from  ${connection.remoteAddress}`)
 	}
 	removeClient(id) {
-		let clients = [
-			...this.clients,
-		]
+		let clients = [...this.clients]
 		let clientIndex = clients.findIndex((client) => client.userid === id)
 		clients.splice(clientIndex, 1)
 		this.clients = clients
@@ -63,8 +84,8 @@ export class WebSocket {
 		connection.on('close', (connection) => {
 			console.log('User', userID, 'has left the game.')
 			let cclient = this.getClientByType('userid', userID)
-			if (!isNaN(cclient.player)){
-				this.ready > 0 ? this.ready = this.ready - 1 : null
+			if (!isNaN(cclient.player)) {
+				this.ready > 0 ? (this.ready = this.ready - 1) : null
 				this.playersReady = this.playersReady - 1
 				console.log('was a player, making room for new players')
 			}
@@ -77,7 +98,7 @@ export class WebSocket {
 		for (let i = 0; i < clients.length; i++) {
 			clients[i].connection.sendUTF(data)
 		}
-		console.log('MESSAGE WE SENT TO CLIENT:', filter, JSON.parse(data))
+		console.log('MESSAGE WE SENT TO CLIENT:', filter, data)
 	}
 	handleRequest(message, userID) {
 		let request = JSON.parse(message.utf8Data)
@@ -109,13 +130,13 @@ export class WebSocket {
 			this.sendMessage(json)
 			break
 		case reqTypes.READYUP:
-			this.ready = this.ready+1
+			this.ready = this.ready + 1
 			console.log(this.ready)
 			if (this.ready >= 2) {
 				startTimer()
 				this.sendMessage(json)
 			}
-			
+
 			break
 		case reqTypes.GAME_MOVE:
 			json.data = {
