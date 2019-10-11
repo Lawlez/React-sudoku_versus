@@ -7,7 +7,7 @@ import Game from './containers/game'
 import {w3cwebsocket as W3CWebSocket} from 'websocket'
 import './static/index.css'
 import csshake from 'csshake/dist/csshake.min.css'
-export const client = new W3CWebSocket('ws://192.168.100.211:8080')
+export const client = new W3CWebSocket('ws://localhost:8080')
 
 if (!DEV_ENV) {
 	console.log = () => {

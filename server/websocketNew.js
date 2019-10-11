@@ -81,7 +81,7 @@ export class WebSocket {
 			}
 			this.handleRequest(message, userID)
 		})
-		connection.on('close', (connection) => {
+		connection.on('close', () => {
 			console.log('User', userID, 'has left the game.')
 			let cclient = this.getClientByType('userid', userID)
 			if (!isNaN(cclient.player)) {
@@ -98,7 +98,7 @@ export class WebSocket {
 		for (let i = 0; i < clients.length; i++) {
 			clients[i].connection.sendUTF(data)
 		}
-		console.log('MESSAGE WE SENT TO CLIENT:', filter, data)
+		console.log('MESSAGE WE SENT TO CLIENT:', filter, JSON.parse(data))
 	}
 	handleRequest(message, userID) {
 		let request = JSON.parse(message.utf8Data)
