@@ -4,6 +4,7 @@ import MyButton from '../components/button'
 import { setTempName, setPlayerN } from '../store/user/userActions'
 import { connect } from 'react-redux'
 import { onSubmit } from './handlers'
+import { bindActionCreators } from 'redux'
 const Login = (props) => {
 	return (
 		<div className="loginWrapper">
@@ -18,11 +19,11 @@ const Login = (props) => {
 					variant="contained"
 					text="Start!"
 					onClick={() => onSubmit(
-							props.user.playerNumber,
-							props.user.tempName,
-							props.allPlayers,
-							props.setPlayerN,
-						)}
+						props.user.playerNumber,
+						props.user.tempName,
+						props.allPlayers,
+						props.setPlayerN,
+					)}
 					cooldown={props.user.tempName ? false : true}
 					
 				/>
@@ -49,16 +50,15 @@ const mapStateToProps = (state) => {
 		allPlayers: state.game.allPlayers
 	}
 }
-const mapDispatchToProps = (dispatch) => {
-	return {
-		setTempName: (name) => {
-			dispatch(setTempName(name))
+
+const mapDispatchToProps = dispatch => ({
+	...bindActionCreators(
+		{
+			setTempName,
+			setPlayerN,
 		},
-		setPlayerN: (number) => {
-			dispatch(setPlayerN(number))
-		},
-	}
-}
+		dispatch,
+	)})
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps,

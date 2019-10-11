@@ -5,33 +5,33 @@ const userReducer = (state = {
 	playerNumber: null
 }, action ) =>{
 	switch (action.type) {
-		case 'SET_TEMP_NAME':
-			state = {
-				...state,
-				tempName: action.payload
-			}
+	case 'SET_TEMP_NAME':
+		state = {
+			...state,
+			tempName: action.payload
+		}
 		break
-		case 'SET_USER_NAME':
+	case 'SET_USER_NAME':
 		state = {
 			...state,
 			userName: action.payload
 		}
 		break
-		case 'SET_LOGGED_IN':
+	case 'SET_LOGGED_IN':
 		state = {
 			...state,
 			isLoggedIn: action.payload
 		}
 		break
-		case 'SET_PLAYER_N':
+	case 'SET_PLAYER_N':
 		state = {
-				...state,
-				playerNumber: action.payload
-			}
-		break
-		default:
-		return state
+			...state,
+			playerNumber: action.payload
 		}
+		break
+	default:
+		return state
+	}
 	return state
 }
 

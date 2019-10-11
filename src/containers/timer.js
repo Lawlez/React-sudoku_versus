@@ -1,5 +1,6 @@
 //Timer
 import React from 'react'
+import { connect } from 'react-redux'
 export const Timer = (props) => {
 	let timerContent = props.time + ' seconds'
 	return (
@@ -8,4 +9,11 @@ export const Timer = (props) => {
 		</div>
 	)
 }
-export default Timer
+const mapStateToProps = state => {
+	return {
+		time: state.game.time
+	}
+}
+export default connect(
+	mapStateToProps,{}
+)(Timer)

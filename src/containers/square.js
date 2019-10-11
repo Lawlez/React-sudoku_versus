@@ -1,6 +1,7 @@
 //Square
 import React from 'react'
-import InputField from './inputfield'
+import InputField from '../components/inputfield'
+import { connect } from 'react-redux'
 export const NewSquare = (props) => {
 	let field
 	if (props.value) {
@@ -16,7 +17,7 @@ export const NewSquare = (props) => {
 		if (props.opponent) {
 			field = (
 				<div className="square opponent">
-					{props.opponentValues ? (
+					{props.opponentFields && props.opponentFields[props.keys] ? (
 						<span className="poo" role="img" aria-label="poo">
 							💩
 						</span>
@@ -28,12 +29,12 @@ export const NewSquare = (props) => {
 				<div className="square  opponent">
 					{' '}
 					{props.opponent ? (
-						props.opponentValues ? (
+						props.opponentFields && props.opponentFields[props.keys] ? (
 							<span className="poo" role="img" aria-label="poo">
 								💩
 							</span>
 						) : null
-					) : props.inputValue ? (
+					) : props.fields && props.fields[props.keys] ? (
 						<span className="poo" role="img" aria-label="poo">
 							💩
 						</span>
@@ -43,7 +44,7 @@ export const NewSquare = (props) => {
 		} else {
 			field = (
 				<InputField
-					value={props.inputValue}
+					value={props.fields && props.fields[props.keys]}
 					deleteValue={() => props.deleteValue()}
 					onCorrectInput={(value) => props.handleUserInput(value)}
 				/>
@@ -52,4 +53,18 @@ export const NewSquare = (props) => {
 	}
 	return <div className={'squareWrapper ' + props.shake}>{field}</div>
 }
-export default NewSquare
+const mapStateToProps = (state, ownProps) => {
+	return {
+		player: state.user.playerNumber,
+		opponentFields: state.game.opponentFields,
+		fields: state.game.fieldInput,
+		opponent: ownProps.opponent,
+		value: ownProps.value,
+		keys: ownProps.id,
+		shake: state.game.shake
+	}
+}
+
+export default connect(
+	mapStateToProps,
+)(NewSquare)

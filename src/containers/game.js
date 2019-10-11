@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {
 	setAllPlayers,
 	setBoard,
@@ -11,7 +11,7 @@ import {
 	setMemes,
 } from '../store/game/gameActions'
 import { setChatHistory, setUserActivity } from '../store/chat/chatActions'
-import { setUserName, setLoggedIn, setPlayerN } from '../store/user/userActions'
+import { setUserName, setLoggedIn} from '../store/user/userActions'
 import {
 	Container,
 	Paper,
@@ -21,15 +21,15 @@ import {
 } from '@material-ui/core'
 require('babel-polyfill') //to make async work with webpack
 import {
-	Timer,
 	MyButton,
 	RenderBoard,
 	GetReady,
 } from '../components'
 import {client} from '..'
-import {connect} from 'react-redux'
+import { connect} from 'react-redux'
 import Login from './login'
 import Chat from './chat'
+import { bindActionCreators } from 'redux'
 import {
 	handleUserInput,
 	resetGame,
@@ -40,7 +40,8 @@ import {
 	handleAttacks,
 	getDankMemes,
 } from './handlers'
-
+import {CSS, COOLDOWN, ATTACK_DURATION} from '../config'
+import Timer from './timer'
 const useStyles = makeStyles((theme) => ({
 	root: {
 		flexGrow: 1,
@@ -62,36 +63,20 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Game = (props) => {
-	//const [isLoggedIn, setIsLoggedIn] = useState(false) //toggle logiin
-	//const [userName, setUserName] = useState()
-	//const [userActivity, setUserActivity] = useState([])
-	const [fieldInput, setFieldInput] = useState('')
-	const [opponentFields, setOpponentFields] = useState({})
-	//const [playerNumber, setPlayerNumber] = useState('')
-	//const [tempName, setTempName] = useState('')
-	//const [allPlayers, setAllPlayers] = useState(0)
 	const classes = useStyles()
-	//const [messageHistory, setMessageHistory] = useState([])
-	//const [time, setTime] = useState(0)
-	//const [board, setBoard] = useState([])
-	//const [cooldown, setCooldown] = useState(true)
 	let dataFromServer
-	//const [shake, setShake] = useState({board: null, cell: null})
-	//const [memes, setMemes] = useState(false)
-	//const [ready, setReady] = useState(false)
 	////// Websocket functions start///////////////////
 	client.onopen = () => {
 		sendMessage(null, null, 'ready') //tell srv we're ready
-		console.log('WebSocket Client Connected to server')
+		console.log('%cWebSocket Client Connected to server\n\n', CSS)
 	}
 	client.onclose = () => {
-		console.warn('WebSocket server closing or offline...')
+		console.warn('%cWebSocket server closing or offline...', 'color:orange;font-size:large')
 	}
 	client.onmessage = (message) => {
-		// console.log(message)
 		dataFromServer = JSON.parse(message.data)
-		console.log('im RECIEVING parsed:', dataFromServer)
-		// console.log('im player ', playerNumber)
+		console.log('%cim RECIEVING parsed: Type: %c%s','color:#baf; font-size:large', 'color:#0f0; font-size:large', dataFromServer.type)
+		console.table(dataFromServer && dataFromServer.board ? dataFromServer.board : dataFromServer.data)
 
 		if (dataFromServer.type === 'info') {
 			if (dataFromServer.players) {
@@ -112,19 +97,18 @@ export const Game = (props) => {
 			return
 		}
 		if (dataFromServer.type === 'userevent') {
-			/* ON USEREVENT*/
 			console.log(
 				`${props.user.tempName} local ... server ${dataFromServer.data.username}`,
 			)
 			let index = dataFromServer.data.userActivity.length - 1
-				console.log(
-					`UserActivity index: ${dataFromServer.data.userActivity[index]}`,
-				)
-				let newestActivity = [
-					...props.userActivity,
-					dataFromServer.data.userActivity[index],
-				]
-				props.setUserActivity(newestActivity)
+			console.log(
+				`UserActivity index: ${dataFromServer.data.userActivity[index]}`,
+			)
+			let newestActivity = [
+				...props.userActivity,
+				dataFromServer.data.userActivity[index],
+			]
+			props.setUserActivity(newestActivity)
 			if (props.user.tempName === dataFromServer.data.username) {
 				
 				props.setUserName(dataFromServer.data.username)
@@ -145,7 +129,7 @@ export const Game = (props) => {
 				dataFromServer.data.userActivity[index],
 			]
 			props.setUserActivity(newestActivity)
-			setFieldInput(undefined)
+			props.setGameMove(undefined)
 		}
 
 		if (dataFromServer.type === 'chat') {
@@ -157,9 +141,9 @@ export const Game = (props) => {
 
 			if (props.user.playerNumber === 'spectator') {
 				if (dataFromServer.data.gameField1) {
-					setFieldInput(dataFromServer.data.gameField1)
-					setOpponentFields(dataFromServer.data.gameField2)
-					console.log(fieldInput)
+					props.setGameMove(dataFromServer.data.gameField1)
+					props.setOpponentMove(dataFromServer.data.gameField2)
+					console.log(props.fieldInput)
 				}
 			} else {
 				console.log(
@@ -167,11 +151,11 @@ export const Game = (props) => {
 				)
 				if (dataFromServer.data.player === props.user.playerNumber) {
 					console.log('I made a move')
-					setFieldInput(dataFromServer.data.gameField)
-					console.log(fieldInput)
+					props.setGameMove(dataFromServer.data.gameField)
+					console.log(props.fieldInput)
 				} else {
 					console.log('OPPONENT made a move')
-					setOpponentFields(dataFromServer.data.gameField)
+					props.setOpponentMove(dataFromServer.data.gameField)
 				}
 			}
 		}
@@ -195,7 +179,7 @@ export const Game = (props) => {
 				props.setCooldown(true)
 				setTimeout(function() {
 					props.setCooldown(false)
-				}, 15000)
+				}, COOLDOWN)
 				return
 			}
 			if (attack && attack.state ? attack.state : null) {
@@ -204,38 +188,35 @@ export const Game = (props) => {
 					(props.user.playerNumber === 'spectator')
 				) {
 					switch (attack.type) {
-						case 'SHAKE':
-							props.setShake({
-								board:
-									'shake-slow shake-constant shake-constant-hover',
-								cell: 'shake-freeze shake-crazy',
-							})
-							setTimeout(function() {
-								props.setShake({board: null, cell: null})
-							}, 3000)
-							break
-
-						case 'BLACK':
-							props.setShake({board: 'black', cell: 'black'})
-							setTimeout(function() {
-								props.setShake({board: null, cell: null})
-							}, 3000)
-							break
-						case 'MEME':
-							console.log('inside memes gen')
-							getDankMemes(props.setMemes)
-							setTimeout(function() {
-								props.setMemes(false)
-							}, 3000)
-							break
-						case 'SWITCH':
-							break
+					case 'SHAKE':
+						props.setShake({
+							board:'shake-slow shake-constant shake-constant-hover',
+							cell: 'shake-freeze shake-crazy',
+						})
+						setTimeout(function() {
+							props.setShake({board: null, cell: null})
+						}, ATTACK_DURATION)
+						break
+					case 'BLACK':
+						props.setShake({board: 'black', cell: 'black'})
+						setTimeout(function() {
+							props.setShake({board: null, cell: null})
+						}, ATTACK_DURATION)
+						break
+					case 'MEME':
+						console.log('%c( ͡° ͜ʖ ͡°) getting %cMemes', 'color: green; font size:large;',CSS)
+						getDankMemes(props.setMemes)
+						setTimeout(function() {
+							props.setMemes(false)
+						}, ATTACK_DURATION)
+						break
+					case 'SWITCH':
+						break
 					}
 				}
 			}
 		}
 	}
-	console.log(props.game.cooldown, props.game.ready)
 	////// Websocket functions end///////////////////
 	return (
 		<div className="game">
@@ -248,21 +229,20 @@ export const Game = (props) => {
 				<Login/>
 			) : (
 				<div>
-					{!props.game.ready && !isNaN(props.user.playerNumber) ? (
+					{!props.ready && !isNaN(props.user.playerNumber) ? (
 						<GetReady
 							playerName={props.userName}
-							setReady={setReady}
 							playerNumber={props.user.playerNumber}
 						/>
 					) : (
-						console.log(props.game.ready)
+						console.log(props.ready)
 					)}
 					<Container>
-						<Timer time={props.game.time} />
+						<Timer/>
 					</Container>
-					{props.game.memes ? (
+					{props.memes ? (
 						<div className="memecontainer">
-							<div className="memes">{props.game.memes}</div>
+							<div className="memes">{props.memes}</div>
 						</div>
 					) : (
 						''
@@ -272,7 +252,7 @@ export const Game = (props) => {
 							<Grid
 								item
 								xs={6}
-								className={'gameField1 ' + props.game.shake.board}
+								className={'gameField1 ' + props.shake.board}
 							>
 								<Paper className={classes.paper}>
 									<RenderBoard
@@ -283,7 +263,7 @@ export const Game = (props) => {
 												props.user.playerNumber,
 											)
 										}
-										fields={props.game.board}
+										fields={props.board}
 										handleUserInput={(e, cellID) =>
 											handleUserInput(
 												e,
@@ -292,10 +272,6 @@ export const Game = (props) => {
 												props.user.playerNumber,
 											)
 										}
-										inputValues={fieldInput}
-										opponentFields={opponentFields}
-										player={props.user.playerNumber}
-										shake={props.game.shake.cell}
 									/>
 									{isNaN(props.user.playerNumber) ? (
 										<div>
@@ -308,10 +284,10 @@ export const Game = (props) => {
 												}
 												text="Attack"
 												color="secondary"
-												cooldown={props.game.cooldown}
+												cooldown={props.cooldown}
 											/>
 											,
-											{props.game.cooldown | !props.game.ready ? (
+											{props.cooldown | !props.ready ? (
 												<CircularProgress
 													size={24}
 													className={
@@ -342,7 +318,7 @@ export const Game = (props) => {
 														endGame(
 															props.user.userName,
 															props.user.playerNumber,
-															fieldInput,
+															props.fieldInput,
 														)
 													}
 													text="i'm done!"
@@ -357,11 +333,8 @@ export const Game = (props) => {
 							<Grid item xs={6} className="playField2">
 								<Paper className={classes.paper}>
 									<RenderBoard
-										fields={props.game.board}
-										handleUserInput
+										fields={props.board}
 										opponent="true"
-										opponentFields={opponentFields}
-										player={props.user.playerNumber}
 									/>
 								</Paper>
 							</Grid>
@@ -376,60 +349,40 @@ export const Game = (props) => {
 	)
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	return {
 		user: state.user,
-		game: state.game,
+		//game: state.game,
+		board: state.game.board,
+		cooldown: state.game.cooldown,
+		memes:state.game.memes,
+		shake: state.game.shake,
+		ready: state.game.ready,
+		fieldInput: state.game.fieldInput,
 		userActivity: state.chat.userActivity,
 	}
 }
 
-const mapDispatchToProps = (dispatch) => {
-	return {
-		setUserName: (name) => {
-			dispatch(setUserName(name))
+const mapDispatchToProps = dispatch => ({
+	...bindActionCreators(
+		{
+			setUserName,
+			setLoggedIn,
+			setGameMove,
+			setOpponentMove,
+			setAllPlayers,
+			setGameTime,
+			setBoard,
+			setCooldown,
+			setShake,
+			setMemes,
+			setReady,
+			setChatHistory,
+			setUserActivity
 		},
-		setLoggedIn: (login) => {
-			dispatch(setLoggedIn(login))
-		},
-		setPlayerN: (number) => {
-			dispatch(setPlayerN(number))
-		},
-		setGameMove: (move) => {
-			dispatch(setGameMove(move))
-		},
-		setOpponentMove: (move) => {
-			dispatch(setOpponentMove(move))
-		},
-		setAllPlayers: (players) => {
-			dispatch(setAllPlayers(players))
-		},
-		setGameTime: (time) => {
-			dispatch(setGameTime(time))
-		},
-		setBoard: (board) => {
-			dispatch(setBoard(board))
-		},
-		setCooldown: (cooldown) => {
-			dispatch(setCooldown(cooldown))
-		},
-		setShake: (shake) => {
-			dispatch(setShake(shake))
-		},
-		setMemes: (memes) => {
-			dispatch(setMemes(memes))
-		},
-		setReady: (ready) => {
-			dispatch(setReady(ready))
-		},
-		setChatHistory: (history) =>{
-			dispatch(setChatHistory(history))
-		},
-		setUserActivity: (activity) => {
-			dispatch(setUserActivity(activity))
-		},
-	}
-}
+		dispatch,
+	)
+})
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps,
