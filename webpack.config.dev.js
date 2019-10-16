@@ -48,6 +48,16 @@ module.exports = {
 				test: /\.html$/,
 				use: ['html-loader'],
 			},
+			{
+            	test: /\.(png|jp(e*)g|svg)$/,  
+            	use: [{
+                	loader: 'url-loader',
+                	options: { 
+                   		limit: 8000, // Convert images < 8kb to base64 strings
+                    	name: 'images/[hash]-[name].[ext]'
+                	} 
+            	}]
+        	}
 		],
 	},
 	devtool: 'cheap-module-eavl-source-map',
@@ -58,5 +68,6 @@ module.exports = {
 		open: true,
 		port: 3000,
 		https:false,
+		host: '0.0.0.0'
 	},
 }

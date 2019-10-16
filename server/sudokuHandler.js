@@ -1,6 +1,7 @@
 //sudokuHandler
 import {webSocket} from './server'
 import {activityHandler, userActivity} from './activityHandler'
+import {setHighscore} from './srvHelpers'
 const fetch = require('node-fetch')
 const klsudoku = require('klsudoku')
 export let currentBoard = [] //board as soon as players regenerate (replaces initialBoard)
@@ -24,6 +25,7 @@ export const getSolution = (getBoard = null) => {
 }
 
 export const sudokuMaster = (sudoku) => {
+	let score = 0
 	console.log('inside master')
 	if (Object.keys(sudoku).length > 0) {
 		console.log('sudoku true')
@@ -31,7 +33,7 @@ export const sudokuMaster = (sudoku) => {
 		if (solution === undefined) {
 			solution = getSolution()
 		}
-		let corrVals = 0
+		
 		for (let keyid in sudoku) {
 			let key = keyid.replace('cell', '')
 			let rowid = key[0]
@@ -46,15 +48,15 @@ export const sudokuMaster = (sudoku) => {
 			)
 			if (Number(userInputValue) !== Number(solution.charAt(position))) {
 				console.warn('values wrong')
-				return 'aww i´m sorry to tell you but this aint correct..'
+				return {msg: 'aww i´m sorry to tell you but this aint correct..', score}
 			}
-			corrVals++
+			score++
 		}
-		if (corrVals < 40) {
-			return 'all entered values correct. finish it!'
-		}} else {return 'did you even solve anything? nice try..'
+		if (score < 40) {
+			return {msg: 'all entered values correct. finish it!', score}
+		}} else {return {msg: 'did you even solve anything? nice try..',score}
 	}
-	return true
+	return {score}
 }
 const getLocalBoard = ()=>{//FALLBACK if API is down
 	let result = klsudoku.generate()
@@ -81,24 +83,35 @@ export const getBoard = (difficulty = 'easy') => {
 		})
 		.catch(() => getLocalBoard()) //fall back to local generator in case API goes OFFLINE
 }
-export const endGame = (
+export const endGame = async (
 	dataFromClient
 ) => {
 	let json = {type:'endgame'}
 	let gameField1 = webSocket.getClientByType('player', 1)
 	let gameField2 = webSocket.getClientByType('player', 2)
 	let player1Win = (gameField1 && gameField1.moves) ? sudokuMaster(gameField1.moves) : 'board is empty.. booohoo'
+	console.log("player1Win", player1Win);
 	let player2Win = (gameField2 && gameField2.moves) ? sudokuMaster(gameField2.moves) : 'board is empty..'
-	if (player2Win === true) {
+	console.log("player2Win", player2Win);
+	if (!isNaN(player2Win)) {
 		activityHandler('Player 2 has WON the game!🥳 Congratulations!')
-	} else if (player1Win === true) {
+	} else if (!isNaN(player1Win)) {
 		activityHandler('Player 1 has WON the game!🥳 Congratulations!')
 	} else {
 		activityHandler(
-			`Guys 🙄 nobody filled the board correctly.. Player1:${player1Win} Player2:${player2Win}, how dare you submit wrong answers @Player ${dataFromClient.player}? now deal with this🤷💀 `
+			`Guys 🙄 nobody filled the board correctly.. Player1:${player1Win.msg} Player2:${player2Win.msg}, how dare you submit wrong answers @Player ${dataFromClient.player}? now deal with this🤷💀 `
 		)
 		webSocket.punish(dataFromClient.player)
 	}
+	console.log(player1Win)
+	webSocket.setClients(gameField1.userid, 'score', player1Win.score)
+	webSocket.setClients(gameField1.userid, 'time', dataFromClient.msg)
+	webSocket.setClients(gameField2.userid, 'score', player2Win.score)
+	webSocket.setClients(gameField2.userid, 'time', dataFromClient.msg)
+
+	console.log(dataFromClient)
+	let p1score = await setHighscore(gameField1.userid)
+	let p2score = await setHighscore(gameField2.userid)
 	json.data = {
 		player: dataFromClient.player,
 		player1: player1Win,

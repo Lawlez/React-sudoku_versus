@@ -1,7 +1,7 @@
 //server-side Chat handler
 import {getBoard, getSolution} from './sudokuHandler'
 import {webSocket} from './server'
-import {startTimer, stopTimer, handleAttacks} from './srvHelpers'
+import {startTimer, stopTimer, handleAttacks, readHighscore} from './srvHelpers'
 import {defaultChatMsg} from '../config'
 let messageHistory = [...defaultChatMsg]
 let currentBoard
@@ -57,6 +57,15 @@ const chatCommands = {
 		webSocket.stop()
 		console.log('starting server')
 		webSocket.start()
+	},
+	highscore: async () => {
+		let score
+		score = await readHighscore(messageHistory).catch((err) => {console.log(err)})
+		let hiscore = await score
+		const params = {
+		username: 'server',
+		dataFromClient: {msg:hiscore}
+		}
 	}
 }
 
@@ -65,6 +74,7 @@ const sendChatMessage = (params) => {
 		...messageHistory,
 		`${params.username}: ${params.dataFromClient.msg}`
 	]
+	console.log("params.dataFromClient.msg", params.dataFromClient);
 	let json = {
 		type: 'chat',
 		data: {

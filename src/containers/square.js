@@ -61,7 +61,7 @@ const mapStateToProps = (state, ownProps) => {
 		opponent: ownProps.opponent,
 		value: ownProps.value,
 		keys: ownProps.id,
-		shake: state.game.shake
+		shake: state.game.shake.cell
 	}
 }
 

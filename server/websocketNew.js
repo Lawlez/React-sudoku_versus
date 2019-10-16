@@ -8,12 +8,15 @@ import {
 	DEV_ENV,
 	attackTypes,
 	ATTACK_DURATION,
+	HIGHSCORE_FILE,
+	SCORE_EQUATION
 } from '../config' //importing constants
 import {
 	getUniqueID,
 	handleAttacks,
 	userRegisterHandler,
 	startTimer,
+	setHighscore
 } from './srvHelpers'
 import {newChatHandler} from './chatHandler'
 import {getBoard, endGame, currentBoard} from './sudokuHandler'
@@ -43,6 +46,8 @@ export class WebSocket {
 			COOLDOWN,
 			ATTACK_DURATION,
 			DEV_ENV,
+			HIGHSCORE_FILE,
+			SCORE_EQUATION
 		})
 		console.table(attackTypes)
 		console.groupEnd()
@@ -81,7 +86,7 @@ export class WebSocket {
 			}
 			this.handleRequest(message, userID)
 		})
-		connection.on('close', () => {
+		connection.on('close', (connection) => {
 			console.log('User', userID, 'has left the game.')
 			let cclient = this.getClientByType('userid', userID)
 			if (!isNaN(cclient.player)) {
@@ -215,7 +220,6 @@ export class WebSocket {
 		let index = this.getClientIndex(client.userid)
 		client.moves = {...client.moves, [position]: move}
 		this.clients[index] = client
-		console.log('this.clients[index]', this.clients[index])
 
 		return client.moves
 	}

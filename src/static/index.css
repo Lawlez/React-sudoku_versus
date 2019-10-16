@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	font-family: 'Roboto';
+	font-family: 'Quicksand', sans-serif;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -37,12 +37,21 @@ body {
 .fieldContainer {
 	margin-bottom: 25px;
 }
-
+.logo{
+	width: 300px;
+    position: relative;
+    display: flex;
+    margin: inherit;
+    margin-bottom: -62px;
+    left: -26em;
+}
 .playField1 {
 	display: inline-flex;
 	width: 510px;
 }
-
+#chat{
+	font-family: 'Quicksand', sans-serif!important;
+}
 .playField2 {
 	display: flex;
 	width: 510px;
@@ -71,15 +80,17 @@ body {
 	width: auto;
 	max-width: 130px;
 	padding: 5px;
+	margin-left: auto;
+	margin-top: 20px;
+	margin-right: auto;
 	margin-bottom: 20px;
 }
 
 .loginWrapper {
 	height: 100%;
-	min-height: 400px;
-	width: 100%;
+	min-height: 500px;
 	background-color: #333;
-	padding-top: 10%;
+	padding-top: 20%;
 	padding-left: 20%;
 	padding-right: 20%;
 }
@@ -172,7 +183,7 @@ body {
 
 .getReady {
 	background: rgba(80, 80, 80, 0.6);
-	height: 500px;
+	height: 590px;
 	padding-top: 100px;
 	width: 100%;
 	display: block;
@@ -193,15 +204,34 @@ body {
 }
 
 @media (max-width: 720px) {
+	.logo{
+	width: 250px;
+    position: relative;
+    display: flex;
+    margin: inherit;
+    margin-bottom: -18px;
+    left:0;
+}
 	.opponent {
-		width: 28px;
-		height: 28px;
+		width: 24px;
+		height: 24px;
 		border: 1px solid;
 	}
-
+	.opponent input {
+		border: 1px;
+		border-radius: 0 !important;
+		width: 24px !important;
+		height: 24px !important;
+	}
+	#chat{
+		font-size: 0.9em;
+	}
+	.MuiList-root{
+		min-width: 0px!important;
+	}
 	.square {
-		width: 32px;
-		height: 25px;
+		width: 38px;
+		height: 31px;
 		font-size: 14px;
 		text-align: center;
 		font-weight: bolder;
@@ -209,7 +239,7 @@ body {
 
 	.loginWrapper {
 		height: 100%;
-		min-height: 200px;
+		min-height: 400px;
 		width: 100%;
 		background-color: #333;
 		padding-top: 5%;
@@ -218,14 +248,67 @@ body {
 	}
 
 	.fieldContainer input {
-		border: 1px;
+		border: 1px solid #333;
 		border-radius: 0 !important;
-		width: 20px !important;
-		height: 20px !important;
+		width: 24px !important;
+		height: 24px !important;
 	}
 
 	.MuiGrid-container {
 		display: block !important;
+		margin-bottom: 20px;
+	}
+	.MuiGrid-grid-xs-6 {
+    /* flex-grow: 0; */
+    max-width: 100%!important;
+    flex-basis: 50%;
+}
+	.poo {
+		color: rgba(0, 0, 0, 1);
+		font-size: 22px !important;
+		display: inline-flex;
+	}
+}
+@media (max-width: 1100px) and (min-width: 725px) {
+	.opponent {
+		width: 26px!important;
+		height: 26px!important;
+		border: 1px solid!important;
+	}
+.opponent input{
+		width: 26px!important;
+		height: 26px!important;
+		border: 1px solid!important;
+	}
+	.square {
+		width: 26px;
+		height: 26px;
+		font-size: 14px;
+		text-align: center;
+		font-weight: bolder;
+	}
+
+	.loginWrapper {
+		height: 100%;
+		min-height: 400px;
+		width: 100%;
+		background-color: #333;
+		padding-top: 10%;
+		padding-left: 10%;
+		padding-right: 5%;
+		border:1px solid #000;
+	}
+	.gameField1{
+		margin-bottom: 25px;
+	}
+	.fieldContainer input {
+		border-radius: 0 !important;
+		width: 22px !important;
+		height: 22px !important;
+	}
+
+	.MuiGrid-container {
+		display: flex !important;
 		margin-bottom: 20px;
 	}
 
@@ -234,10 +317,14 @@ body {
 		font-size: 22px !important;
 		display: inline-flex;
 	}
+	.MuiGrid-container {
+    flex-wrap: inherit!important; 
+    box-sizing: border-box;
+}
 }
 
 /* fuck apples IOS overrides */
-textarea,
-input[type='text'] .input-checkbox {
+
+input {
 	-webkit-appearance: none !important;
 }
