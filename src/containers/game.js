@@ -1,4 +1,5 @@
-import React from 'react'
+import React, {useEffect} from 'react'
+import store from '../store'
 import {
 	setAllPlayers,
 	setBoard,
@@ -10,26 +11,25 @@ import {
 	setShake,
 	setMemes,
 } from '../store/game/gameActions'
-import { setChatHistory, setUserActivity } from '../store/chat/chatActions'
-import { setUserName, setLoggedIn} from '../store/user/userActions'
+import logo from '../static/sudokuvs.png'
+import {createSnackbar, closeSnackbar} from '../store/notify/notifyActions'
+import {setChatHistory, setUserActivity} from '../store/chat/chatActions'
+import {setUserName, setLoggedIn} from '../store/user/userActions'
 import {
 	Container,
 	Paper,
 	Grid,
 	CircularProgress,
+	Button,
 	makeStyles,
 } from '@material-ui/core'
 require('babel-polyfill') //to make async work with webpack
-import {
-	MyButton,
-	RenderBoard,
-	GetReady,
-} from '../components'
+import {MyButton, RenderBoard, GetReady} from '../components'
 import {client} from '..'
-import { connect} from 'react-redux'
+import {connect} from 'react-redux'
 import Login from './login'
 import Chat from './chat'
-import { bindActionCreators } from 'redux'
+import {bindActionCreators} from 'redux'
 import {
 	handleUserInput,
 	resetGame,
@@ -52,7 +52,8 @@ const useStyles = makeStyles((theme) => ({
 		color: theme.palette.text.secondary,
 	},
 	button: {
-		margin: theme.spacing(1),
+		margin: theme.spacing(0.5),
+		color: '#f6f6f6',
 	},
 	buttonProgress: {
 		color: 'green',
@@ -65,18 +66,58 @@ const useStyles = makeStyles((theme) => ({
 export const Game = (props) => {
 	const classes = useStyles()
 	let dataFromServer
+	const newSnackBar = (text, actionText, type) => {
+		props.createSnackbar({
+			message: text,
+			options: {
+				key: new Date().getTime() + Math.random(),
+				variant: type,
+				action: (key) => (
+					<Button
+						className={classes.button}
+						variant="outlined"
+						color="inherit"
+						onClick={() => props.closeSnackbar(key)}
+					>
+						{actionText}
+					</Button>
+				),
+			},
+		})
+	}
+	useEffect(() => {
+		let index = props.userActivity.length - 1
+		console.log('USEFEECT RAN')
+		if (index != -1) {
+			newSnackBar(props.userActivity[index], 'nice', 'info')
+		}
+	}, [props.userActivity])
 	////// Websocket functions start///////////////////
 	client.onopen = () => {
 		sendMessage(null, null, 'ready') //tell srv we're ready
 		console.log('%cWebSocket Client Connected to server\n\n', CSS)
+		newSnackBar('WebSocket Client Connected to server', 'cool', 'info')
 	}
 	client.onclose = () => {
-		console.warn('%cWebSocket server closing or offline...', 'color:orange;font-size:large')
+		console.warn(
+			'%cWebSocket server closing or offline...',
+			'color:orange;font-size:large',
+		)
+		newSnackBar('WebSocket server closing or offline...', 'Dang..', 'error')
 	}
 	client.onmessage = (message) => {
 		dataFromServer = JSON.parse(message.data)
-		console.log('%cim RECIEVING parsed: Type: %c%s','color:#baf; font-size:large', 'color:#0f0; font-size:large', dataFromServer.type)
-		console.table(dataFromServer && dataFromServer.board ? dataFromServer.board : dataFromServer.data)
+		console.log(
+			'%cim RECIEVING parsed: Type: %c%s',
+			'color:#baf; font-size:large',
+			'color:#0f0; font-size:large',
+			dataFromServer.type,
+		)
+		console.table(
+			dataFromServer && dataFromServer.board
+				? dataFromServer.board
+				: dataFromServer,
+		)
 
 		if (dataFromServer.type === 'info') {
 			if (dataFromServer.players) {
@@ -110,11 +151,14 @@ export const Game = (props) => {
 			]
 			props.setUserActivity(newestActivity)
 			if (props.user.tempName === dataFromServer.data.username) {
-				
 				props.setUserName(dataFromServer.data.username)
 				props.setLoggedIn(true)
 			} else if (dataFromServer.data.username === 'UsrNameTaken') {
-				alert('username already exists! sorry :c ')
+				newSnackBar(
+					'username already exists! sorry :c ',
+					'okay',
+					'warning',
+				)
 				props.setLoggedIn(false)
 			}
 			if (dataFromServer.data.playersReady > 0) {
@@ -136,6 +180,28 @@ export const Game = (props) => {
 			props.setChatHistory([...dataFromServer.data.chat])
 		}
 
+		if (dataFromServer.type === 'solve') {
+			
+			let board = dataFromServer.data.gamefield
+			let x = 0
+			for (let row in board) {
+				console.count(board[row])
+				let y = 0
+				for (let cell in board[row]) {
+					let move = {
+						type: 'gamemove',
+						player: props.user.playerNumber,
+						username:props.user.userName,
+						input: board[row][cell],
+						inputPos: `cell${x}${y}`,
+					}
+					y++
+					console.count(move)
+					client.send(JSON.stringify(move))
+				}
+				x++
+			}
+		}
 		if (dataFromServer.type === 'gamemove') {
 			console.log('in gamemove')
 
@@ -169,11 +235,11 @@ export const Game = (props) => {
 		}
 		if (dataFromServer.type === 'attack') {
 			let index = dataFromServer.data.userActivity.length - 1
-			let newestActivity = [
-				...props.userActivity,
+			newSnackBar(
 				dataFromServer.data.userActivity[index],
-			]
-			props.setUserActivity(newestActivity)
+				'(∩ᵔ ͜ʖᵔ)⊃━☆ﾟ.*',
+				'warning',
+			)
 			let attack = handleAttacks(dataFromServer)
 			if (attack === 'onCooldown') {
 				props.setCooldown(true)
@@ -190,7 +256,8 @@ export const Game = (props) => {
 					switch (attack.type) {
 					case 'SHAKE':
 						props.setShake({
-							board:'shake-slow shake-constant shake-constant-hover',
+							board:
+									'shake-slow shake-constant shake-constant-hover',
 							cell: 'shake-freeze shake-crazy',
 						})
 						setTimeout(function() {
@@ -204,7 +271,11 @@ export const Game = (props) => {
 						}, ATTACK_DURATION)
 						break
 					case 'MEME':
-						console.log('%c( ͡° ͜ʖ ͡°) getting %cMemes', 'color: green; font size:large;',CSS)
+						console.log(
+							'%c( ͡° ͜ʖ ͡°) getting %cMemes',
+							'color: green; font size:large;',
+							CSS,
+						)
 						getDankMemes(props.setMemes)
 						setTimeout(function() {
 							props.setMemes(false)
@@ -220,25 +291,22 @@ export const Game = (props) => {
 	////// Websocket functions end///////////////////
 	return (
 		<div className="game">
-			<Container>
-				<div className="userActivity">
-					activity: {props.userActivity[props.userActivity.length - 1]}
-				</div>
-			</Container>
 			{!props.user.isLoggedIn ? (
-				<Login/>
+				<Login />
 			) : (
 				<div>
 					{!props.ready && !isNaN(props.user.playerNumber) ? (
 						<GetReady
-							playerName={props.userName}
+							playerName={props.user.userName}
 							playerNumber={props.user.playerNumber}
 						/>
 					) : (
 						console.log(props.ready)
 					)}
 					<Container>
-						<Timer/>
+						<img className="logo" src={logo} />
+
+						<Timer />
 					</Container>
 					{props.memes ? (
 						<div className="memecontainer">
@@ -305,7 +373,8 @@ export const Game = (props) => {
 													onClick={() =>
 														resetGame(
 															props.user.userName,
-															props.user.playerNumber,
+															props.user
+																.playerNumber,
 														)
 													}
 													text="reset"
@@ -317,8 +386,12 @@ export const Game = (props) => {
 													onClick={() =>
 														endGame(
 															props.user.userName,
-															props.user.playerNumber,
+															props.user
+																.playerNumber,
 															props.fieldInput,
+															store.getState()
+																.game.time,
+															newSnackBar,
 														)
 													}
 													text="i'm done!"
@@ -341,7 +414,7 @@ export const Game = (props) => {
 						</Grid>
 					</Container>
 					<Container>
-						<Chat/>
+						<Chat />
 					</Container>
 				</div>
 			)}
@@ -349,13 +422,12 @@ export const Game = (props) => {
 	)
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	return {
 		user: state.user,
-		//game: state.game,
 		board: state.game.board,
 		cooldown: state.game.cooldown,
-		memes:state.game.memes,
+		memes: state.game.memes,
 		shake: state.game.shake,
 		ready: state.game.ready,
 		fieldInput: state.game.fieldInput,
@@ -363,7 +435,7 @@ const mapStateToProps = state => {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	...bindActionCreators(
 		{
 			setUserName,
@@ -378,10 +450,12 @@ const mapDispatchToProps = dispatch => ({
 			setMemes,
 			setReady,
 			setChatHistory,
-			setUserActivity
+			setUserActivity,
+			createSnackbar,
+			closeSnackbar,
 		},
 		dispatch,
-	)
+	),
 })
 export default connect(
 	mapStateToProps,

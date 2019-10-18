@@ -90,15 +90,15 @@ export const deleteValue = (cell, userName, playerNumber) => {
 	sendMessage(userName, playerNumber, 'gamemove', '', '', cell)
 }
 
-export const endGame = (userName, playerNumber, fieldInput) => {
+export const endGame = (userName, playerNumber, fieldInput, time, newSnackBar) => {
 	if (!fieldInput) {
-		console.warn('fill the board first bro')
+		newSnackBar('fill the board first bro','ok sorry', 'warning')
 		return
 	} else if (Object.keys(fieldInput).length < 5) {
-		console.warn('fill at least some values')
+		newSnackBar('fill at least some values','ok sorry', 'warning')
 		return
 	}
-	sendMessage(userName, Number(playerNumber), 'endgame')
+	sendMessage(userName, Number(playerNumber), 'endgame', time)
 }
 ///////// ATTACK function////////
 export const launchAttack = (userName, playerNumber) => {

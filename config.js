@@ -26,6 +26,8 @@ export const attackTypes = {
 
 export const DEV_ENV = true //set to false to turn off logging
 export const COOLDOWN = 2000 //in ms
-export const SRV_PORT = 8080
+export const SRV_PORT = 80
 export const INITIAL_BOARD = 'easy' //set diff of default board
 export const ATTACK_DURATION = 2000 //how long attacks last in ms
+export const HIGHSCORE_FILE = 'server/logs/Highscore.json'  //where highscores are saved
+export const SCORE_EQUATION = '(score / time) * score * 100'//inside srvHelpers  

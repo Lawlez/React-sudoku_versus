@@ -1,13 +1,10 @@
-import {
-	playersReady,
-	json,
-	webSocket,
-} from './server'
+import {playersReady, json, webSocket} from './server'
 import activityHandler, {userActivity} from './activityHandler'
-import {defaultChatMsg, COOLDOWN, attackTypes} from '../config'
+import {defaultChatMsg, COOLDOWN, attackTypes, HIGHSCORE_FILE} from '../config'
 ////////TIMER FUNCTION///////////
 let playTimer = 0
 let startTime = null
+const fs = require('fs')
 export const gameTimer = () => {
 	playTimer = playTimer + 1
 	playTimer.toFixed(3)
@@ -151,4 +148,94 @@ export const userRegisterHandler = (
 	return output
 }
 
+let file = HIGHSCORE_FILE //apply path from config
+const checkHighscore = async () => {
+	let fileExists = false
+	fs.mkdir('server/logs/', {recursive: true}, (err) => {
+		if (err) {
+			throw err
+		} else {
+			checkFile()
+		}
+	})
+	const checkFile = () => {
+		fs.access(file, fs.constants.F_OK | fs.constants.W_OK, (err) => {
+			if (err) {
+				console.error(
+					`${file} ${
+						err.code === 'ENOENT'
+							? 'does not exist'
+							: 'is read-only'
+					}`,
+				)
+				fs.writeFileSync(file, '', (e) => {
+					console.log('file created', e)
+					fileExists = true
+				})
+			} else {
+				console.log(`${file} exists, and it is writable`)
+				fileExists = true
+			}
+		})
+	}
+	return fileExists
+}
+const writeToHighscore = (data, UID, highscore, time, place) => {
+	let newHighscore = {username: UID, highscore: highscore, time: time, rank: place}
+	let newHighscoreArray = [...data.highscore]
+	
+	newHighscoreArray.splice(place -1, 0, newHighscore)
+	
+	for (let y = newHighscoreArray.length; y > 10;){
+		newHighscoreArray.splice(-1,1)
+		y = newHighscoreArray.length
+	}
+	let newHighscoreData = {'highscore': newHighscoreArray}
+	fs.writeFileSync(file, JSON.stringify(newHighscoreData), 'utf-8')
+	console.log('write', newHighscoreData)
+}
+export const readHighscore = (UID, highscore, time, f) => {
+	return new Promise((fullfill, reject) => {
+
+		let jsonData
+		fs.readFile(file, (err, buffer) => {
+			let data = buffer.toString()
+			jsonData = (data === '' )? '' : JSON.parse(data)
+			console.log('jsonData.highscore', jsonData.highscore)
+			if (f) {
+				let place = 11
+				for (let x =9; x >-1;  x--) {
+					if (jsonData.highscore[x].highscore < highscore) {
+						place--
+					} 
+				}
+				if (place < 11){
+					f(jsonData, UID, highscore, time, place)
+					fullfill()
+				}
+			} else {
+				let messageHistory = [...UID]
+				let newHighscoreArray = [...jsonData.highscore]
+				for (let scorer in newHighscoreArray) {
+					messageHistory = [ ...messageHistory, `Server: Player ${newHighscoreArray[scorer].username} made ${newHighscoreArray[scorer].highscore} Points in ${newHighscoreArray[scorer].time} Seconds` ]
+				}
+				webSocket.sendMessage({type: 'chat', data: {chat: messageHistory}})
+
+			}
+		})
+
+	})
+
+}
+
+export const setHighscore = async (UID) => {
+	await checkHighscore()
+	let data = []
+	for (let uid in UID) {
+		let user = webSocket.getClientByType('userid', UID[uid])
+		let score = (user.score / user.time) * user.score * 100
+		data.push({user, score})
+	}
+	readHighscore(data[0].user.username, data[0].score, data[0].user.time, writeToHighscore ).then(readHighscore(data[1].user.username, data[1].score, data[1].user.time, writeToHighscore))
+}
 export default gameTimer

@@ -1,52 +1,52 @@
-export function setGameMove(move) {
+export const setGameMove=move=> {
 	return{
 		type:'SET_GAME_MOVE',
 		payload: move
 	}
 }
-export function setOpponentMove(move) {
+export const setOpponentMove=move=> {
 	return{
 		type:'SET_OPPONENT_MOVE',
 		payload: move
 	}
 }
-export function setAllPlayers(players) {
+export const setAllPlayers=players=> {
 	return{
 		type:'SET_ALL_PLAYERS',
 		payload: players
 	}
 }
-export function setGameTime(time) {
+export const setGameTime=time=> {
 	return{
 		type:'SET_GAME_TIME',
 		payload: time
 	}
 }
-export function setBoard(board) {
+export const setBoard=board=> {
 	return{
 		type:'SET_BOARD',
 		payload: board
 	}
 }
-export function setCooldown(cooldown) {
+export const setCooldown=cooldown=> {
 	return{
 		type:'SET_COOLDOWN',
 		payload: cooldown
 	}
 }
-export function setShake(shake) {
+export const setShake=shake=> {
 	return{
 		type:'SET_SHAKE',
 		payload: shake
 	}
 }
-export function setMemes(memes) {
+export const setMemes=memes=> {
 	return{
 		type:'SET_MEMES',
 		payload: memes
 	}
 }
-export function setReady(ready) {
+export const setReady=ready=> {
 	return{
 		type:'SET_READY',
 		payload: ready
