@@ -92,10 +92,9 @@ export const endGame = async (
 	let player1Win = (gameField1 && gameField1.moves) ? sudokuMaster(gameField1.moves) : 'board is empty.. booohoo'
 	console.log("player1Win", player1Win);
 	let player2Win = (gameField2 && gameField2.moves) ? sudokuMaster(gameField2.moves) : 'board is empty..'
-	console.log("player2Win", player2Win);
-	if (!isNaN(player2Win)) {
+	if (player2Win.score >= 80) {
 		activityHandler('Player 2 has WON the game!🥳 Congratulations!')
-	} else if (!isNaN(player1Win)) {
+	} else if (player1Win.score  >= 80) {
 		activityHandler('Player 1 has WON the game!🥳 Congratulations!')
 	} else {
 		activityHandler(
@@ -104,14 +103,15 @@ export const endGame = async (
 		webSocket.punish(dataFromClient.player)
 	}
 	console.log(player1Win)
-	webSocket.setClients(gameField1.userid, 'score', player1Win.score)
-	webSocket.setClients(gameField1.userid, 'time', dataFromClient.msg)
-	webSocket.setClients(gameField2.userid, 'score', player2Win.score)
-	webSocket.setClients(gameField2.userid, 'time', dataFromClient.msg)
+	let UID1 = gameField1.userid
+	let UID2 = gameField2.userid
+	webSocket.setClients(UID1, 'score', player1Win.score)
+	webSocket.setClients(UID1, 'time', dataFromClient.msg)
+	webSocket.setClients(UID2, 'score', player2Win.score)
+	webSocket.setClients(UID2, 'time', dataFromClient.msg)
 
-	console.log(dataFromClient)
-	let p1score = await setHighscore(gameField1.userid)
-	let p2score = await setHighscore(gameField2.userid)
+	setHighscore({UID1, UID2})
+	//let p2score = setHighscore(gameField2.userid)
 	json.data = {
 		player: dataFromClient.player,
 		player1: player1Win,

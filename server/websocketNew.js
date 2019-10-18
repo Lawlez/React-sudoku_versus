@@ -53,6 +53,7 @@ export class WebSocket {
 		console.groupEnd()
 		console.timeEnd('started in')
 		console.log('\nヽ(⌣ ͜ʖ⌣”)ﾉ')
+		//setHighscore('lllol')
 	}
 	stop() {
 		this.server.close()

@@ -48,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const Chat = (props) => {
-	//const [userMessage, setUserMessage] = useState('')
 	const classes = useStyles()
 
 	useEffect(() => {

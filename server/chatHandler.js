@@ -35,8 +35,10 @@ const chatCommands = {
 	solve: (params) => {
 		console.log('/solve detected')
 		let board = getSolution(true)
+		console.log(board)
+
 		let json = {
-			type: 'gamemove'
+			type: 'solve'
 		}
 		json.data = {
 			username: params.username,
@@ -63,8 +65,8 @@ const chatCommands = {
 		score = await readHighscore(messageHistory).catch((err) => {console.log(err)})
 		let hiscore = await score
 		const params = {
-		username: 'server',
-		dataFromClient: {msg:hiscore}
+			username: 'server',
+			dataFromClient: {msg:hiscore}
 		}
 	}
 }

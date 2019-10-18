@@ -1,5 +1,5 @@
 import {applyMiddleware, combineReducers, createStore, compose} from 'redux'
-import {createLogger} from 'redux-logger'
+//import {createLogger} from 'redux-logger'
 import user from './store/user/userReducer'
 import chat from './store/chat/chatReducer'
 import game from './store/game/gameReducer'
@@ -13,5 +13,5 @@ export default createStore(
 		notify,
 	}),
 	{},
-	composeEnhancers(applyMiddleware(createLogger())),
+	composeEnhancers(applyMiddleware(/*createLogger()*/)),
 )

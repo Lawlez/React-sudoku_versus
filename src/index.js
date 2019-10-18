@@ -6,7 +6,7 @@ import {DEV_ENV} from './config'
 import Game from './containers/game'
 import {w3cwebsocket as W3CWebSocket} from 'websocket'
 import './static/index.css'
-import csshake from 'csshake/dist/csshake.min.css'
+import 'csshake/dist/csshake.min.css'
 import {SnackbarProvider} from 'notistack'
 import Notifier from './notifier.js'
 export const client = new W3CWebSocket('ws://192.168.100.90:80')
@@ -19,6 +19,12 @@ if (!DEV_ENV) {
 		/*i dont do anything*/
 	}
 	console.error = () => {
+		/*i dont do anything*/
+	}
+	console.table = () => {
+		/*i dont do anything*/
+	}
+	console.count = () => {
 		/*i dont do anything*/
 	}
 }

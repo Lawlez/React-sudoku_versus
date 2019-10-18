@@ -31,7 +31,7 @@
     "lintserver": "eslint './server/**/*.js'",
     "fix": "eslint --fix-dry-run './src/**/*.js'",
     "fixserver": "eslint --fix './server/**/*.js'",
-    "server": "nodemon --exec babel-node server/server.js",
+    "server": "nodemon --ignore 'logs/' --exec babel-node server/server.js",
     "build": "webpack --config webpack.config.prod.js",
     "start": "webpack-dev-server --config webpack.config.dev.js",
     "test": "react-scripts test",

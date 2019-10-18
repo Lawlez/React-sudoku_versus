@@ -14,7 +14,7 @@ module.exports = {
 			template: 'public/index.html',
 			title: 'Sudoku Versus',
 			meta: {
-				'viewport':
+				viewport:
 					'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 				'Content-Security-Policy':
 					'default-src none; script-src self; connect-src self 192.168.100.211 ws://192.168.100.211:8080 http://www.reddit.com; img-src self http://www.reddit.com https://i.redd.it data: http://192.168.100.211:3000; style-src self unsafe-inline; manifest-src self',
@@ -49,15 +49,17 @@ module.exports = {
 				use: ['html-loader'],
 			},
 			{
-            	test: /\.(png|jp(e*)g|svg)$/,  
-            	use: [{
-                	loader: 'url-loader',
-                	options: { 
-                   		limit: 8000, // Convert images < 8kb to base64 strings
-                    	name: 'images/[hash]-[name].[ext]'
-                	} 
-            	}]
-        	}
+				test: /\.(png|jp(e*)g|svg)$/,
+				use: [
+					{
+						loader: 'url-loader',
+						options: {
+							limit: 8000, // Convert images < 8kb to base64 strings
+							name: 'images/[hash]-[name].[ext]',
+						},
+					},
+				],
+			},
 		],
 	},
 	devtool: 'cheap-module-eavl-source-map',
@@ -67,7 +69,7 @@ module.exports = {
 		hot: true,
 		open: true,
 		port: 3000,
-		https:false,
-		host: '0.0.0.0'
+		https: false,
+		host: '0.0.0.0',
 	},
 }
