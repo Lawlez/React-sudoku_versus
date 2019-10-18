@@ -90,6 +90,7 @@ export const endGame = async (
 	let gameField1 = webSocket.getClientByType('player', 1)
 	let gameField2 = webSocket.getClientByType('player', 2)
 	let player1Win = (gameField1 && gameField1.moves) ? sudokuMaster(gameField1.moves) : 'board is empty.. booohoo'
+	console.log("player1Win", player1Win);
 	let player2Win = (gameField2 && gameField2.moves) ? sudokuMaster(gameField2.moves) : 'board is empty..'
 	if (player2Win.score >= 80) {
 		activityHandler('Player 2 has WON the game!🥳 Congratulations!')
@@ -111,7 +112,6 @@ export const endGame = async (
 
 	setHighscore({UID1, UID2})
 	//let p2score = setHighscore(gameField2.userid)
-
 	json.data = {
 		player: dataFromClient.player,
 		player1: player1Win,

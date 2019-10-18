@@ -154,11 +154,7 @@ export const Game = (props) => {
 				props.setUserName(dataFromServer.data.username)
 				props.setLoggedIn(true)
 			} else if (dataFromServer.data.username === 'UsrNameTaken') {
-				newSnackBar(
-					'username already exists! sorry :c ',
-					'okay',
-					'warning',
-				)
+				newSnackBar('username already exists! sorry :c ','okay','warning')
 				props.setLoggedIn(false)
 			}
 			if (dataFromServer.data.playersReady > 0) {
@@ -286,7 +282,7 @@ export const Game = (props) => {
 					}
 				}
 			}
-		}
+		}	
 	}
 	////// Websocket functions end///////////////////
 	return (
@@ -305,7 +301,6 @@ export const Game = (props) => {
 					)}
 					<Container>
 						<img className="logo" src={logo} />
-
 						<Timer />
 					</Container>
 					{props.memes ? (
@@ -432,6 +427,7 @@ const mapStateToProps = (state) => {
 		ready: state.game.ready,
 		fieldInput: state.game.fieldInput,
 		userActivity: state.chat.userActivity,
+		time: state.game.time
 	}
 }
 

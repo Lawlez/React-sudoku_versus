@@ -76,6 +76,7 @@ const sendChatMessage = (params) => {
 		...messageHistory,
 		`${params.username}: ${params.dataFromClient.msg}`
 	]
+	console.log("params.dataFromClient.msg", params.dataFromClient);
 	let json = {
 		type: 'chat',
 		data: {

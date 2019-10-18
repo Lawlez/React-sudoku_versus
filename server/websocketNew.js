@@ -87,7 +87,7 @@ export class WebSocket {
 			}
 			this.handleRequest(message, userID)
 		})
-		connection.on('close', () => {
+		connection.on('close', (connection) => {
 			console.log('User', userID, 'has left the game.')
 			let cclient = this.getClientByType('userid', userID)
 			if (!isNaN(cclient.player)) {
