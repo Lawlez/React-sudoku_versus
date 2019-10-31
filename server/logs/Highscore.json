@@ -1,14 +1,1 @@
-{
-	"highscore": [
-		{"username": "kooo", "highscore": 218700, "time": 3, "rank": 1},
-		{"username": "choochoo", "highscore": 164025, "time": 4, "rank": 1},
-		{"username": "lool", "highscore": 144025, "time": 4, "rank": 2},
-		{"username": "lwm", "highscore": 64025, "time": 4, "rank": 3},
-		{"username": "893074892", "highscore": 31220, "time": 5, "rank": 2},
-		{"username": "ed", "highscore": 20503.125, "time": 32, "rank": 6},
-		{"username": "gt", "highscore": 20503.125, "time": 32, "rank": 7},
-		{"username": "893074892", "highscore": 1220, "time": 5, "rank": 3},
-		{"highscore": 220, "time": 5, "rank": 4},
-		{"highscore": 200, "time": 5, "rank": 5}
-	]
-}
+{"highscore":[{"username":"Thanos","highscore":218700,"time":3,"rank":1},{"username":"choochoo","highscore":164025,"time":4,"rank":1},{"username":"lool","highscore":144025,"time":4,"rank":2},{"username":"errrrrrrrr","highscore":109350,"time":6,"rank":4},{"username":"fml","highscore":64025,"time":4,"rank":3},{"username":"893074892","highscore":31220,"time":5,"rank":2},{"username":"o00owoo","highscore":21164,"time":31,"rank":7},{"username":"cccomboo-breaker","highscore":20503,"time":32,"rank":6},{"username":"snoopy","highscore":20502,"time":32,"rank":7},{"username":"who dis","highscore":14404,"time":21,"rank":9}]}

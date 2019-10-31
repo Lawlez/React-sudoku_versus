@@ -2,4 +2,5 @@ import RenderBoard from './board'
 import MyButton from './button'
 import InputField from './inputfield'
 import GetReady from './getready'
-export {RenderBoard, MyButton, InputField, GetReady}
+import Highscores from './highscores'
+export {RenderBoard, MyButton, InputField, GetReady, Highscores}
