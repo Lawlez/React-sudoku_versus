@@ -1,6 +1,6 @@
 {
   "name": "sudoku_versus",
-  "version": "0.2.0",
+  "version": "0.6.0",
   "private": true,
   "dependencies": {
     "@babel/preset-react": "^7.0.0",
@@ -17,12 +17,14 @@
     "mini-css-extract-plugin": "^0.8.0",
     "notistack": "^0.9.4",
     "react": "^16.9.0",
+    "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^16.9.0",
     "react-redux": "^7.1.1",
     "react-scripts": "3.1.1",
     "redux": "^4.0.4",
     "style-loader": "^1.0.0",
     "sudoku-solver": "^0.0.2",
+    "uifx": "^2.0.3",
     "webpack-bundle-analyzer": "^3.5.2",
     "websocket": "^1.0.30"
   },
@@ -64,6 +66,7 @@
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "emoji-mart": "^2.11.1",
     "eslint-config-react": "^1.1.7",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.15.1",

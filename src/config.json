@@ -1,0 +1,35 @@
+{
+  "defaultChatMsg": [
+    "Server: Hey Players 👋,The game starts when both players joined & you type /start in the chat. Your field is the blue one. To fill in a field simply click it and start typing, players have the option to reset their own field.",
+    "Server: Hey Spectators! 🤩 Attacks are selected at random and will be launched at both players & become available after a time delay. F in the chat guys"
+  ],
+  "reqTypes": {
+    "USER_EVENT": "userevent",
+    "GAME_MOVE": "gamemove",
+    "ATTACK": "attack",
+    "RESET": "resetgame",
+    "CHAT": "chat",
+    "TIME": "time",
+    "SOLVE": "solve",
+    "ENDGAME": "endgame",
+    "HIGHSCORE": "highscores",
+    "READY": "ready",
+    "READYUP": "readyup",
+    "INFO": "info"
+  },
+  "attackTypes": {
+    "SHAKE": "shakes the playfield",
+    "BLACK": "People like Darkmode right?",
+    "SWITCH": "switches playfield values",
+    "COOL": "onCooldown",
+    "MEME": "display distracting memes & gifs"
+  },
+  "WEBSOCKET_URL": "ws://192.168.100.90:8080",
+  "DEV_ENV": true,
+  "COOLDOWN": 5000,
+  "ATTACK_DURATION": 25000,
+  "SRV_PORT": 8080,
+  "INITIAL_BOARD": "easy",
+  "HIGHSCORE_FILE": "server/logs/highscore.json",
+  "SCORE_EQUATION": "(score / time) * score * 100"
+}

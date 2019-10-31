@@ -1,422 +1,495 @@
 body {
-	margin: 0;
-	font-family: 'Quicksand', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+    margin                 : 0;
+    font-family            : 'Quicksand', sans-serif;
+    -webkit-font-smoothing : antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow               : visible !important;
+}
+
+@supports (-ms-ime-align:auto) {
+    .emojiSpan {
+        bottom: 50px;
+    }
+}
+
+@keyframes fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@-webkit-keyframes fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+@-moz-keyframes fade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1
+    }
+}
+
+.example-appear {
+    opacity: 0.01;
+}
+
+.example-appear.example-appear-active {
+    opacity           : 1;
+    transition        : opacity 1.5s ease-in;
+    -webkit-transition: opacity 1.5s ease-in;
+    -moz-transition   : opacity 1.5s ease-in;
+    -ms-transition    : opacity 1.5s ease-in;
+    -o-transition     : opacity 1.5s ease-in;
+}
+
+.count-leave {
+    opacity: 1;
+}
+
+.count-leave.count-leave-active {
+    opacity           : 0;
+    transition        : fade 1.5s ease-in;
+    -webkit-transition: fade 1.5s ease-in;
+    -moz-transition   : fade 1.5s ease-in;
+    -ms-transition    : fade 1.5s ease-in;
+    -o-transition     : fade 1.5s ease-in;
+
 }
 
 .row div:nth-child(3) {
-	border-right: 3px solid #000;
+    border-right: 3px solid #000;
 }
 
 .row div:nth-child(6) {
-	border-right: 3px solid #000;
+    border-right: 3px solid #000;
 }
 
 .row:nth-child(3) {
-	border-bottom: 3px solid #000;
+    border-bottom: 3px solid #000;
 }
 
 .row:nth-child(6) {
-	border-bottom: 3px solid #000;
+    border-bottom: 3px solid #000;
+}
+
+.emojiSpan {
+    position: absolute;
+    bottom  : 100px;
+    right   : 14%;
+}
+
+.emojiBtn {
+    padding: 5px;
+    height : 56px;
+    bottom : -3px;
+}
+
+.emoji-mart-bar {
+    display: none;
+}
+
+.countdown {
+    position          : absolute;
+    margin            : auto;
+    bottom            : 50%;
+    left              : 50%;
+    right             : 50%;
+    display           : flex;
+    z-index           : 2002;
+    font-size         : 150px;
+    transition        : 700ms opacity ease-in;
+    -webkit-transition: 700ms opacity ease-in;
+    -moz-transition   : 700ms opacity ease-in;
+    -ms-transition    : 700ms opacity ease-in;
+    -o-transition     : 700ms opacity ease-in;
 }
 
 .square {
-	width: 50px;
-	height: 50px;
-	font-size: 20px;
-	text-align: center;
-	font-weight: bolder;
+    width      : 50px;
+    height     : 50px;
+    font-size  : 20px;
+    text-align : center;
+    font-weight: bolder;
 }
 
 .row {
-	display: inline-flex;
-	display: -webkit-inline-box;
+    display: inline-flex;
+    display: -webkit-inline-box;
 }
 
 .fieldContainer {
-	margin-bottom: 25px;
+    margin-bottom: 25px;
 }
 
 .logo {
-	width: 300px;
-	position: relative;
-	display: flex;
-	margin: inherit;
-	margin-bottom: -62px;
-	left: -26em;
+    width        : 300px;
+    position     : relative;
+    display      : flex;
+    margin       : inherit;
+    margin-bottom: -62px;
+    left         : -26em;
 }
 
 .playField1 {
-	display: inline-flex;
-	width: 510px;
+    display: inline-flex;
+    width  : 510px;
 }
 
 #chat {
-	font-family: 'Quicksand', sans-serif !important;
+    font-family: 'Quicksand', sans-serif !important;
 }
 
 .playField2 {
-	display: flex;
-	width: 510px;
+    display: flex;
+    width  : 510px;
 }
 
 .playField2 .immutable {
-	color: #fff;
-	border-color: #d81b60 !important;
-	background: #f50057 !important;
+    color       : #fff;
+    border-color: #d81b60 !important;
+    background  : #f50057 !important;
 }
 
 .game {
-	padding: 0px;
-	background: #f6f6f6;
-	margin-bottom: 2px;
+    padding      : 0px;
+    background   : #f6f6f6;
+    margin-bottom: 2px;
 }
 
 .immutable {
-	color: #fff;
-	background: #3f51b5;
-	border: 2px solid #3949ab;
+    color     : #fff;
+    background: #3f51b5;
+    border    : 2px solid #3949ab;
 }
 
 .timer {
-	border: 2px solid #000;
-	width: auto;
-	max-width: 130px;
-	padding: 5px;
-	margin-left: auto;
-	margin-top: 20px;
-	margin-right: auto;
-	margin-bottom: 20px;
+    border            : 2px solid #000;
+    width             : auto;
+    max-width         : 130px;
+    padding           : 5px;
+    margin-left       : auto;
+    margin-top        : 20px;
+    margin-right      : auto;
+    margin-bottom     : 20px;
+    animation-name    : fade;
+    animation-duration: .2s;
 }
 
 .loginWrapper {
-	height: 100%;
-	min-height: 500px;
-	background-color: #333;
-	padding-top: 20%;
-	padding-left: 20%;
-	padding-right: 20%;
+    height          : 100%;
+    min-height      : 500px;
+    background-color: #333;
+    padding-top     : 20%;
+    padding-left    : 20%;
+    padding-right   : 20%;
 }
 
 .loginInner {
-	height: 50px;
-	width: 400px;
-	padding: 50px;
-	background-color: #f6f6f6;
-	font-size: 18px;
-	border: 1px solid #f6f6f6;
-	border-radius: 10px;
+    height          : 50px;
+    width           : 400px;
+    padding         : 50px;
+    background-color: #f6f6f6;
+    font-size       : 18px;
+    border          : 1px solid #f6f6f6;
+    border-radius   : 10px;
 }
 
 .loginInner input {
-	height: 25px;
-	padding: 2px;
-	padding-left: 8px;
-	font-size: 18px;
-	margin-right: 10px;
+    height      : 25px;
+    padding     : 2px;
+    padding-left: 8px;
+    font-size   : 18px;
+    margin-right: 10px;
 }
 
 .loginInner input[type=radio] {
-	height: 25px;
-	padding: 2px;
-	padding-left: 8px;
-	font-size: 18px;
-	margin-right: 40px;
-	position: relative;
-	left: 22px;
+    height            : 25px;
+    padding           : 2px;
+    padding-left      : 8px;
+    font-size         : 18px;
+    margin-right      : 40px;
+    position          : relative;
+    left              : 22px;
+    animation-name    : fade;
+    animation-duration: 2s;
 }
 
 .loginInner label {
-	position: relative;
-	left: 20px;
-	top: -3px;
-	left: -14px;
+    position: relative;
+    left    : 20px;
+    top     : -3px;
+    left    : -14px;
 }
 
 .memes {
-	display: grid;
-	grid-template-columns: repeat(6, 3fr);
-	grid-template-rows: repeat(6, 15vw);
-	grid-gap: 30px;
-	padding: 50px;
+    display              : grid;
+    grid-template-columns: repeat(6, 3fr);
+    grid-template-rows   : repeat(6, 15vw);
+    grid-gap             : 30px;
+    padding              : 50px;
 }
 
 .memecontainer {
-	position: absolute;
+    position: absolute;
 }
 
 .meme {
-	display: flex;
-	width: 240px;
-	margin-bottom: 160px;
-	z-index: 3432;
+    display           : flex;
+    width             : 240px;
+    margin-bottom     : 160px;
+    z-index           : 3432;
+    animation-name    : fade;
+    animation-duration: 1s;
 }
 
 .userActivity {
-	display: flex;
-	padding: 2px;
-	background-color: #f6f6f6;
-	width: auto;
-	font-size: 12px;
-	max-width: 400px;
+    display         : flex;
+    padding         : 2px;
+    background-color: #f6f6f6;
+    width           : auto;
+    font-size       : 12px;
+    max-width       : 400px;
 }
 
 .opponent {
-	width: 54px;
-	height: 54px;
-	border: 1px solid;
+    width : 54px;
+    height: 54px;
+    border: 1px solid;
 }
 
 .playerSelect {
-	font-size: 16px !important;
-	position: absolute;
-	margin-top: -3px;
-	margin-left: -18px;
+    font-size  : 16px !important;
+    position   : absolute;
+    margin-top : -3px;
+    margin-left: -18px;
 }
 
 .poo {
-	color: rgba(0, 0, 0, 1);
-	font-size: 42px !important;
-	display: inline-flex;
+    color             : rgba(0, 0, 0, 1);
+    font-size         : 42px !important;
+    display           : inline-flex;
+    animation-name    : fade;
+    animation-duration: 2s;
 }
 
 .black {
-	background: #000 !important;
-	color: #000 !important;
-	background-color: #000;
+    background        : #000 !important;
+    color             : #000 !important;
+    background-color  : #000;
+    transition        : fade 3.5s ease-in;
+    -webkit-transition: fade 3.5s ease-in;
+    -moz-transition   : fade 3.5s ease-in;
+    -ms-transition    : fade 3.5s ease-in;
+    -o-transition     : fade 3.5s ease-in;
 }
 
 .black div {
-	color: #000;
-	background: #000;
+    color     : #000;
+    background: #000;
 }
 
 .black input {
-	color: #000 !important;
-	background: #000 !important;
+    color     : #000 !important;
+    background: #000 !important;
 }
 
 .black button {
-	color: #000;
-	background: #888 !important;
+    color     : #000;
+    background: #888 !important;
+}
+
+.getReady .MuiDialog-container {
+    visibility: hidden;
+}
+
+.getReady .MuiPaper-root {
+    visibility: visible;
 }
 
 .getReady {
-	background: rgba(80, 80, 80, 0.6);
-	height: 590px;
-	padding-top: 100px;
-	width: 100%;
-	display: block;
-	align-content: center;
-	position: absolute;
-	margin-left: auto;
-	margin-right: auto;
-	top: 60px;
-	backdrop-filter: blur(5px);
+    background     : rgba(80, 80, 80, 0.6);
+    height         : 600px;
+    padding-top    : 100px;
+    width          : 100%;
+    display        : block;
+    z-index        : 1001;
+    align-content  : center;
+    position       : absolute;
+    margin-left    : auto;
+    margin-right   : auto;
+    backdrop-filter: blur(5px);
+}
+
+.getReady .MuiBackdrop-root {
+    background    : rgba(80, 80, 80, 0);
+    pointer-events: none;
+}
+
+th {
+    font-weight: bold !important;
 }
 
 .readyBtn button {
-	margin-left: auto;
-	margin-right: auto;
-	display: block;
-	padding-right: 10px;
-	padding-left: 10px;
+    margin-left  : auto;
+    margin-right : auto;
+    display      : block;
+    padding-right: 10px;
+    padding-left : 10px;
 }
 
 @media (max-width: 720px) {
+    .logo {
+        width        : 250px;
+        position     : relative;
+        display      : flex;
+        margin       : inherit;
+        margin-bottom: -18px;
+        left         : 0;
+    }
 
-	.logo {
-		width: 250px;
-		position: relative;
-		display: flex;
-		margin: inherit;
-		margin-bottom: -18px;
-		left: 0;
-	}
+    /* fuck apples IOS overrides */
 
-	/* fuck apples IOS overrides */
+    .emojiSpan {
+        position: absolute;
+        bottom  : -450px;
+        right   : 11%;
+    }
 
-	input {
-		-webkit-appearance: none !important;
-	}
+    input {
+        -webkit-appearance: none !important;
+    }
 
-	.opponent {
-		width: 24px;
-		height: 24px;
-		border: 1px solid;
-	}
+    .opponent {
+        width : 24px;
+        height: 24px;
+        border: 1px solid;
+    }
 
-	.opponent input {
-		border: 1px;
-		border-radius: 0 !important;
-		width: 24px !important;
-		height: 24px !important;
-	}
+    .opponent input {
+        border       : 1px;
+        border-radius: 0 !important;
+        width        : 24px !important;
+        height       : 24px !important;
+    }
 
-	#chat {
-		font-size: 0.9em;
-	}
+    #chat {
+        font-size: 0.9em;
+    }
 
-	.MuiList-root {
-		min-width: 0px !important;
-	}
+    .MuiList-root {
+        min-width: 0px !important;
+    }
 
-	.square {
-		width: 38px;
-		height: 31px;
-		font-size: 14px;
-		text-align: center;
-		font-weight: bolder;
-	}
+    .square {
+        width      : 38px;
+        height     : 31px;
+        font-size  : 14px;
+        text-align : center;
+        font-weight: bolder;
+    }
 
-	.loginWrapper {
-		height: 100%;
-		min-height: 400px;
-		width: 100%;
-		background-color: #333;
-		padding-top: 5%;
-		padding-left: 5%;
-		padding-right: 5%;
-	}
+    .loginWrapper {
+        height          : 100%;
+        min-height      : 400px;
+        width           : 100%;
+        background-color: #333;
+        padding-top     : 5%;
+        padding-left    : 5%;
+        padding-right   : 5%;
+    }
 
-	.fieldContainer input {
-		border: 1px solid #333;
-		border-radius: 0 !important;
-		width: 24px !important;
-		height: 24px !important;
-	}
+    .fieldContainer input {
+        border       : 1px solid #333;
+        border-radius: 0 !important;
+        width        : 24px !important;
+        height       : 24px !important;
+    }
 
-	.MuiGrid-container {
-		display: block !important;
-		margin-bottom: 20px;
-	}
-	.MuiGrid-grid-xs-6 {
-    /* flex-grow: 0; */
-    max-width: 100%!important;
-    flex-basis: 50%;
-}
-	.poo {
-		color: rgba(0, 0, 0, 1);
-		font-size: 22px !important;
-		display: inline-flex;
-	}
-}
-@media (max-width: 1100px) and (min-width: 725px) {
-	.opponent {
-		width: 26px!important;
-		height: 26px!important;
-		border: 1px solid!important;
-	}
-.opponent input{
-		width: 26px!important;
-		height: 26px!important;
-		border: 1px solid!important;
-	}
-	.square {
-		width: 26px;
-		height: 26px;
-		font-size: 14px;
-		text-align: center;
-		font-weight: bolder;
-	}
+    .MuiGrid-container {
+        display      : block !important;
+        margin-bottom: 20px;
+    }
 
-	.loginWrapper {
-		height: 100%;
-		min-height: 400px;
-		width: 100%;
-		background-color: #333;
-		padding-top: 10%;
-		padding-left: 10%;
-		padding-right: 5%;
-		border:1px solid #000;
-	}
-	.gameField1{
-		margin-bottom: 25px;
-	}
-	.fieldContainer input {
-		border-radius: 0 !important;
-		width: 22px !important;
-		height: 22px !important;
-	}
+    .MuiGrid-grid-xs-6 {
+        max-width : 100% !important;
+        flex-basis: 50%;
+    }
 
-	.MuiGrid-container {
-		display: flex !important;
-		margin-bottom: 20px;
-	}
-
-	.MuiGrid-grid-xs-6 {
-		/* flex-grow: 0; */
-		max-width: 100% !important;
-		flex-basis: 50%;
-	}
-
-	.poo {
-		color: rgba(0, 0, 0, 1);
-		font-size: 22px !important;
-		display: inline-flex;
-	}
-	.MuiGrid-container {
-    flex-wrap: inherit!important; 
-    box-sizing: border-box;
-}
+    .poo {
+        color    : rgba(0, 0, 0, 1);
+        font-size: 22px !important;
+        display  : inline-flex;
+    }
 }
 
 @media (max-width: 1100px) and (min-width: 725px) {
-	.opponent {
-		width: 26px !important;
-		height: 26px !important;
-		border: 1px solid !important;
-	}
+    .opponent {
+        width : 26px !important;
+        height: 26px !important;
+        border: 1px solid !important;
+    }
 
-	.opponent input {
-		width: 26px !important;
-		height: 26px !important;
-		border: 1px solid !important;
-	}
+    .opponent input {
+        width : 26px !important;
+        height: 26px !important;
+        border: 1px solid !important;
+    }
 
-	.square {
-		width: 26px;
-		height: 26px;
-		font-size: 14px;
-		text-align: center;
-		font-weight: bolder;
-	}
+    .square {
+        width      : 26px;
+        height     : 26px;
+        font-size  : 14px;
+        text-align : center;
+        font-weight: bolder;
+    }
 
-	.loginWrapper {
-		height: 100%;
-		min-height: 400px;
-		width: 100%;
-		background-color: #333;
-		padding-top: 10%;
-		padding-left: 10%;
-		padding-right: 5%;
-		border: 1px solid #000;
-	}
+    .loginWrapper {
+        height          : 100%;
+        min-height      : 400px;
+        width           : 100%;
+        background-color: #333;
+        padding-top     : 10%;
+        padding-left    : 10%;
+        padding-right   : 5%;
+        border          : 1px solid #000;
+    }
 
-	.gameField1 {
-		margin-bottom: 25px;
-	}
+    .gameField1 {
+        margin-bottom: 25px;
+    }
 
-	.fieldContainer input {
-		border-radius: 0 !important;
-		width: 22px !important;
-		height: 22px !important;
-	}
+    .fieldContainer input {
+        border-radius: 0 !important;
+        width        : 22px !important;
+        height       : 22px !important;
+    }
 
-	.MuiGrid-container {
-		display: flex !important;
-		margin-bottom: 20px;
-	}
+    .MuiGrid-container {
+        display      : flex !important;
+        margin-bottom: 20px;
+    }
 
-	.poo {
-		color: rgba(0, 0, 0, 1);
-		font-size: 22px !important;
-		display: inline-flex;
-	}
+    .poo {
+        color    : rgba(0, 0, 0, 1);
+        font-size: 22px !important;
+        display  : inline-flex;
+    }
 
-	.MuiGrid-container {
-		flex-wrap: inherit !important;
-		box-sizing: border-box;
-	}
+    .MuiGrid-container {
+        flex-wrap : inherit !important;
+        box-sizing: border-box;
+    }
 }
